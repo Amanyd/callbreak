@@ -165,7 +165,7 @@ function NameEntry({ onSubmit }: { onSubmit: (name: string) => void }) {
       <div className="panel-hero panel-elevated name-card">
         <div className="name-card-inner">
           <span className="badge badge-primary" style={{ borderRadius: 'var(--radius-lg)', padding: '0.5rem 1.5rem' }}>ENTER THE ARENA</span>
-          <h1 className="display-lg" style={{ marginTop: '1rem' }}>BAD!!</h1>
+          <h1 className="display-lg" style={{ marginTop: '1rem' }}>BREAK ME BAD!!</h1>
           <p className="body-lg" style={{ color: 'var(--on-surface-variant)', marginTop: '0.5rem' }}>
             Set your battle name and join the fight.
           </p>

@@ -1003,25 +1003,21 @@
     overflow: hidden;
   }
   .main-content {
-    /* Scale the entire desktop-style UI down linearly to fit in landscape mobile screens without restacking */
-    transform: scale(0.65);
+    transform: scale(0.45);
     transform-origin: top center;
-    width: 153%; /* 1 / 0.65 to ensure width spans the whole screen *after* scaling */
-    height: 153%; /* 1 / 0.65 to ensure height spans */
+    width: 222%;
+    height: 222%;
   }
 
   .game-layout {
-    /* Retain original sidebar placement! */
     flex-direction: row;
   }
 
-  /* Reduce table padding to make room for full grid */
   .game-table {
     padding: 0.25rem;
     min-height: 80%;
   }
 
-  /* Make scoreboard thin but tall to match */
   .scoreboard {
     width: 280px;
     border-top: none;

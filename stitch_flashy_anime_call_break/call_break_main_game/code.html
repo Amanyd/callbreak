@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Call Break - The Kinetic Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@800;900&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-container": "#4c0021",
+                        "error": "#b41340",
+                        "tertiary-fixed-dim": "#00e5ee",
+                        "surface-bright": "#f9f6f5",
+                        "secondary": "#645d00",
+                        "inverse-primary": "#ff4a8d",
+                        "tertiary-dim": "#00595d",
+                        "on-tertiary-container": "#00575b",
+                        "secondary-fixed": "#f7e600",
+                        "on-secondary-fixed": "#464000",
+                        "error-dim": "#a70138",
+                        "on-tertiary-fixed-variant": "#006266",
+                        "on-tertiary": "#c9fcff",
+                        "on-background": "#2f2f2e",
+                        "on-secondary-container": "#5a5300",
+                        "surface-tint": "#b50058",
+                        "secondary-container": "#f7e600",
+                        "surface-dim": "#d6d4d3",
+                        "surface-variant": "#dfdcdc",
+                        "outline": "#787676",
+                        "primary-container": "#ff709e",
+                        "on-secondary-fixed-variant": "#645d00",
+                        "surface-container": "#eae7e7",
+                        "on-error": "#ffefef",
+                        "on-primary-fixed": "#000000",
+                        "on-surface": "#2f2f2e",
+                        "on-tertiary-fixed": "#004346",
+                        "on-error-container": "#510017",
+                        "tertiary": "#00666a",
+                        "tertiary-container": "#00f4fe",
+                        "inverse-surface": "#0e0e0e",
+                        "primary-fixed": "#ff709e",
+                        "primary": "#b50058",
+                        "primary-fixed-dim": "#ff5290",
+                        "on-primary-fixed-variant": "#5d002a",
+                        "secondary-fixed-dim": "#e7d800",
+                        "outline-variant": "#afadac",
+                        "background": "#f9f6f5",
+                        "inverse-on-surface": "#9e9c9c",
+                        "on-surface-variant": "#5c5b5b",
+                        "error-container": "#f74b6d",
+                        "tertiary-fixed": "#00f4fe",
+                        "surface-container-low": "#f3f0ef",
+                        "on-secondary": "#fff5a0",
+                        "on-primary": "#ffeff1",
+                        "surface-container-highest": "#dfdcdc",
+                        "primary-dim": "#9f004d",
+                        "secondary-dim": "#575100",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f9f6f5",
+                        "surface-container-high": "#e4e2e1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Epilogue", "sans-serif"],
+                        "body": ["Be Vietnam Pro", "sans-serif"],
+                        "label": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    backgroundImage: {
+                        'halftone': 'radial-gradient(circle, #9f004d 2px, transparent 2.5px)',
+                    },
+                    backgroundSize: {
+                        'halftone': '10px 10px',
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .halftone-bg {
+            background-color: #b50058;
+            background-image: radial-gradient(circle, #9f004d 2px, transparent 2.5px);
+            background-size: 10px 10px;
+        }
+        .comic-shadow {
+            box-shadow: 8px 8px 0px 0px #000000;
+        }
+        .comic-stroke {
+            -webkit-text-stroke: 2px #000000;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="font-body text-on-background bg-surface-container overflow-hidden h-screen w-screen flex flex-col">
+<!-- Top Navigation (Anchored from JSON) -->
+<header class="hidden md:flex flex-row justify-between items-center w-full px-6 py-4 docked full-width top-0 border-b-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-primary dark:bg-primary-dim z-50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-white text-3xl font-black cursor-pointer hover:skew-x-2 transition-transform active:translate-y-1 active:shadow-none" data-icon="grid_view">grid_view</span>
+<h1 class="text-2xl font-black italic text-white drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] font-headline uppercase tracking-tight">KINETIC CARDS</h1>
+</div>
+<!-- Web Nav Items (Derived from BottomNavBar JSON for desktop equivalence) -->
+<nav class="flex gap-8">
+<a class="text-secondary-fixed font-black hover:skew-x-2 transition-transform active:translate-y-1 font-label text-sm uppercase flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="style">style</span> BATTLE
+            </a>
+<a class="text-white hover:skew-x-2 transition-transform active:translate-y-1 font-label text-sm uppercase flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="playing_cards">playing_cards</span> DECKS
+            </a>
+<a class="text-white hover:skew-x-2 transition-transform active:translate-y-1 font-label text-sm uppercase flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span> STASH
+            </a>
+<a class="text-white hover:skew-x-2 transition-transform active:translate-y-1 font-label text-sm uppercase flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span> RANKS
+            </a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-white text-2xl cursor-pointer hover:skew-x-2 transition-transform active:translate-y-1" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="material-symbols-outlined text-white text-2xl cursor-pointer hover:skew-x-2 transition-transform active:translate-y-1" data-icon="settings">settings</span>
+</div>
+</header>
+<!-- Main Game Canvas -->
+<main class="flex-1 relative w-full h-full halftone-bg flex items-center justify-center p-4 md:p-8">
+<!-- Scoreboard (Top Right) -->
+<div class="absolute top-4 right-4 md:top-8 md:right-8 z-40 bg-secondary-container border-4 border-black comic-shadow p-4 rounded-xl rotate-2">
+<h2 class="font-headline font-black text-xl uppercase tracking-tighter border-b-4 border-black pb-2 mb-2 text-on-primary-fixed">Scores</h2>
+<ul class="font-label text-sm font-bold space-y-2">
+<li class="flex justify-between gap-8"><span class="text-primary font-black">YOU</span> <span class="text-on-primary-fixed">12 / 15</span></li>
+<li class="flex justify-between gap-8"><span class="text-on-primary-fixed">AKIRA</span> <span class="text-on-primary-fixed">8 / 10</span></li>
+<li class="flex justify-between gap-8"><span class="text-on-primary-fixed">YUKI</span> <span class="text-on-primary-fixed">5 / 5</span></li>
+<li class="flex justify-between gap-8"><span class="text-on-primary-fixed">KEN</span> <span class="text-on-primary-fixed">10 / 12</span></li>
+</ul>
+</div>
+<!-- The Table -->
+<div class="relative w-full max-w-4xl aspect-[4/3] bg-on-background border-[6px] border-black rounded-xl comic-shadow flex items-center justify-center shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
+<!-- Table Inner Felt -->
+<div class="absolute inset-2 bg-surface-container-low border-4 border-black rounded-lg opacity-90"></div>
+<!-- Opponent Top (Akira) -->
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20">
+<div class="w-20 h-20 bg-surface-container border-4 border-black rounded-lg overflow-hidden comic-shadow relative">
+<img alt="Anime style avatar of a serious looking girl with purple hair" class="w-full h-full object-cover grayscale contrast-150" data-alt="Anime style avatar of a serious looking girl with purple hair, flat shading, thick outlines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBvHzi7lfl-6y38aubkYyYrdPSYyRPnLDu7hr_UBf0S3xzV7XiRzvKY1_kMWkgP6JkcufcDEXd6dW6b2W4j2ZV023hQA2J4ARZ65ePVOFAhT-xcDxtX0dVM6LDO7TW02jSxgZuDVlbPI7z1QYALcw6pGSDNmvety4Exy0aLcSPXQBaw8cPVMnQfqo82yF0GLUuCK51WWdd4gOm78B2_XoR5zxuug_z59oo66tqjH120Qmxs9C7nmzpTioaLn_xxs-VTMMhGVswW17J"/>
+<div class="absolute inset-0 bg-primary opacity-20 mix-blend-multiply"></div>
+</div>
+<div class="bg-black text-white font-headline font-black px-3 py-1 rounded text-xs uppercase tracking-widest border-2 border-white -rotate-2">Akira</div>
+<!-- Mini Cards -->
+<div class="flex -space-x-4 mt-1 opacity-80">
+<div class="w-8 h-12 bg-surface border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"></div>
+<div class="w-8 h-12 bg-surface border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"></div>
+<div class="w-8 h-12 bg-surface border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"></div>
+</div>
+</div>
+<!-- Opponent Left (Yuki) -->
+<div class="absolute top-1/2 -left-12 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
+<div class="w-20 h-20 bg-surface-container border-4 border-black rounded-lg overflow-hidden comic-shadow">
+<img alt="Anime style avatar of an energetic girl with yellow hair" class="w-full h-full object-cover grayscale contrast-150" data-alt="Anime style avatar of an energetic girl with yellow hair, flat shading, thick outlines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD54jIaihcW0vj25v7Yvhy6uOKyBn89X_jKO9w_JpMwbLgDphAYef9yvKxvfjLPo97Wz9tQduUN09MKHSZJ7VQM4NI5mjdeGSKXqvA_D3-cnyWaxe7Gwbasn3biN4vobLAjKe2jgrGw8Ky5K_TXS1D3xmAsDAcDbj_iNSwZ4SBMkMLgyfJOjUHarmi5kIpnXURw5UhAEmh9TW-g8iuFrBvgc25m9ZEm02UV2fSwZGOncTp3SCxSZ3OLo9sA2l9w1Bnuz-zFwVng9MK"/>
+<div class="absolute inset-0 bg-secondary-fixed opacity-30 mix-blend-multiply"></div>
+</div>
+<div class="bg-black text-white font-headline font-black px-3 py-1 rounded text-xs uppercase tracking-widest border-2 border-white rotate-3">Yuki</div>
+</div>
+<!-- Opponent Right (Ken) -->
+<div class="absolute top-1/2 -right-12 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
+<div class="w-20 h-20 bg-surface-container border-4 border-black rounded-lg overflow-hidden comic-shadow">
+<img alt="Anime style avatar of a cool boy with blue hair" class="w-full h-full object-cover grayscale contrast-150" data-alt="Anime style avatar of a cool boy with blue hair, flat shading, thick outlines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5jpy5OUqfsfBh9JTRH7gDbN4IMEen-CYQ-VA6--GWEm7hukqXAPNMsd45RA0sUYH-4KgO5gIXB2LAUYPheW6cB5ziQJSGOWGOTMNUl6V_VSdQTJvkkukqtV8tGWrEaYPtzkXC9l-bzCZPCFwq_4y7ot_jJBPERB-uIXcWhbnGQp-Hy2Sa75wJWbZCQBwfvYb2XdfIuPWmGz2U2aDYi_j1d6as8Qf8Reze1RlswFpJQyExVKn7AcKwDcCheJnDDomQrmQQDZRqclEg"/>
+<div class="absolute inset-0 bg-tertiary opacity-30 mix-blend-multiply"></div>
+</div>
+<div class="bg-black text-white font-headline font-black px-3 py-1 rounded text-xs uppercase tracking-widest border-2 border-white -rotate-1">Ken</div>
+</div>
+<!-- Center Table Area (The Trick) -->
+<div class="relative w-64 h-64 flex items-center justify-center z-10">
+<!-- Played Card Top -->
+<div class="absolute -top-4 w-24 h-36 bg-surface border-4 border-black rounded-lg comic-shadow -rotate-6 flex flex-col p-2">
+<span class="font-headline font-black text-2xl text-on-background">K</span>
+<span class="material-symbols-outlined text-on-background self-start" data-icon="favorite" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<div class="flex-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-on-background" data-icon="favorite" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<!-- Played Card Left -->
+<div class="absolute -left-8 top-8 w-24 h-36 bg-surface border-4 border-black rounded-lg comic-shadow rotate-12 flex flex-col p-2">
+<span class="font-headline font-black text-2xl text-primary">A</span>
+<span class="material-symbols-outlined text-primary self-start" data-icon="spa" data-weight="fill" style="font-variation-settings: 'FILL' 1;">spa</span>
+<div class="flex-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="spa" data-weight="fill" style="font-variation-settings: 'FILL' 1;">spa</span>
+</div>
+</div>
+</div>
+<!-- Flashy Bid Popup (Centered over table) -->
+<div class="absolute z-50 bg-tertiary-container border-[6px] border-black rounded-xl p-6 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
+<h3 class="font-headline font-black text-3xl uppercase tracking-tighter text-on-primary-fixed mb-4 comic-stroke">YOUR BID!</h3>
+<div class="flex gap-4 justify-center">
+<button class="w-12 h-12 bg-surface-container-lowest border-4 border-black rounded font-headline font-black text-xl hover:bg-secondary-container hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">3</button>
+<button class="w-12 h-12 bg-primary border-4 border-black rounded font-headline font-black text-xl text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-y-1">4</button>
+<button class="w-12 h-12 bg-surface-container-lowest border-4 border-black rounded font-headline font-black text-xl hover:bg-secondary-container hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">5</button>
+</div>
+</div>
+<!-- User Hand (Bottom) -->
+<div class="absolute -bottom-16 left-1/2 -translate-x-1/2 flex -space-x-12 z-30 group w-full justify-center px-8">
+<div class="w-32 h-48 bg-surface border-4 border-black rounded-xl comic-shadow rotate-[-10deg] translate-y-8 hover:-translate-y-4 hover:rotate-0 transition-all cursor-pointer flex flex-col p-2 relative bg-gradient-to-br from-surface to-surface-variant">
+<div class="font-headline font-black text-3xl text-primary leading-none">J</div>
+<span class="material-symbols-outlined text-primary text-2xl mt-1" data-icon="diamond" data-weight="fill" style="font-variation-settings: 'FILL' 1;">diamond</span>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+<span class="material-symbols-outlined text-8xl text-primary" data-icon="diamond" data-weight="fill" style="font-variation-settings: 'FILL' 1;">diamond</span>
+</div>
+</div>
+<div class="w-32 h-48 bg-surface border-4 border-black rounded-xl comic-shadow rotate-[-5deg] translate-y-4 hover:-translate-y-4 hover:rotate-0 transition-all cursor-pointer flex flex-col p-2 relative bg-gradient-to-br from-surface to-surface-variant">
+<div class="font-headline font-black text-3xl text-on-background leading-none">10</div>
+<span class="material-symbols-outlined text-on-background text-2xl mt-1" data-icon="eco" data-weight="fill" style="font-variation-settings: 'FILL' 1;">eco</span>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+<span class="material-symbols-outlined text-8xl text-on-background" data-icon="eco" data-weight="fill" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+</div>
+<div class="w-32 h-48 bg-surface border-4 border-secondary-fixed rounded-xl shadow-[8px_8px_0px_0px_#f7e600] z-10 -translate-y-2 hover:-translate-y-8 transition-all cursor-pointer flex flex-col p-2 relative bg-gradient-to-br from-surface to-surface-variant">
+<div class="absolute -top-3 -right-3 bg-error text-white font-label font-bold text-xs px-2 py-1 border-2 border-black rounded-full rotate-12">TRUMP</div>
+<div class="font-headline font-black text-3xl text-primary leading-none">A</div>
+<span class="material-symbols-outlined text-primary text-2xl mt-1" data-icon="spa" data-weight="fill" style="font-variation-settings: 'FILL' 1;">spa</span>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+<span class="material-symbols-outlined text-8xl text-primary" data-icon="spa" data-weight="fill" style="font-variation-settings: 'FILL' 1;">spa</span>
+</div>
+</div>
+<div class="w-32 h-48 bg-surface border-4 border-black rounded-xl comic-shadow rotate-[5deg] translate-y-4 hover:-translate-y-4 hover:rotate-0 transition-all cursor-pointer flex flex-col p-2 relative bg-gradient-to-br from-surface to-surface-variant">
+<div class="font-headline font-black text-3xl text-on-background leading-none">Q</div>
+<span class="material-symbols-outlined text-on-background text-2xl mt-1" data-icon="favorite" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+<span class="material-symbols-outlined text-8xl text-on-background" data-icon="favorite" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Mobile Nav (Anchored from JSON) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white dark:bg-zinc-900 border-t-4 border-black rounded-t-[3rem]">
+<a class="flex flex-col items-center justify-center bg-pink-500 text-white rounded-full px-6 py-2 border-2 border-black -translate-y-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:scale-90 transition-all font-['Plus_Jakarta_Sans'] font-bold text-[10px]" href="#">
+<span class="material-symbols-outlined text-xl mb-1" data-icon="style">style</span>
+<span>BATTLE</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-900 dark:text-zinc-100 opacity-60 hover:opacity-100 active:scale-90 transition-all font-['Plus_Jakarta_Sans'] font-bold text-[10px]" href="#">
+<span class="material-symbols-outlined text-xl mb-1" data-icon="playing_cards">playing_cards</span>
+<span>DECKS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-900 dark:text-zinc-100 opacity-60 hover:opacity-100 active:scale-90 transition-all font-['Plus_Jakarta_Sans'] font-bold text-[10px]" href="#">
+<span class="material-symbols-outlined text-xl mb-1" data-icon="shopping_bag">shopping_bag</span>
+<span>STASH</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-900 dark:text-zinc-100 opacity-60 hover:opacity-100 active:scale-90 transition-all font-['Plus_Jakarta_Sans'] font-bold text-[10px]" href="#">
+<span class="material-symbols-outlined text-xl mb-1" data-icon="military_tech">military_tech</span>
+<span>RANKS</span>
+</a>
+</nav>
+</body></html>

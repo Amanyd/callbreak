@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Call Break Kinetic - Lobby</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;family=Epilogue:ital,wght@0,400;0,700;0,900;1,900&amp;family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#afadac",
+                        "tertiary-container": "#00f4fe",
+                        "on-secondary": "#fff5a0",
+                        "error-dim": "#a70138",
+                        "secondary-fixed": "#f7e600",
+                        "primary-fixed-dim": "#ff5290",
+                        "on-secondary-container": "#5a5300",
+                        "on-background": "#2f2f2e",
+                        "on-tertiary": "#c9fcff",
+                        "inverse-on-surface": "#9e9c9c",
+                        "tertiary": "#00666a",
+                        "primary": "#b50058",
+                        "on-secondary-fixed": "#464000",
+                        "surface-variant": "#dfdcdc",
+                        "secondary-container": "#f7e600",
+                        "surface-container-highest": "#dfdcdc",
+                        "on-tertiary-container": "#00575b",
+                        "error-container": "#f74b6d",
+                        "on-surface": "#2f2f2e",
+                        "primary-container": "#ff709e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f3f0ef",
+                        "surface-container": "#eae7e7",
+                        "on-error-container": "#510017",
+                        "primary-fixed": "#ff709e",
+                        "surface-container-high": "#e4e2e1",
+                        "on-secondary-fixed-variant": "#645d00",
+                        "secondary": "#645d00",
+                        "outline": "#787676",
+                        "on-tertiary-fixed": "#004346",
+                        "error": "#b41340",
+                        "background": "#f9f6f5",
+                        "inverse-surface": "#0e0e0e",
+                        "on-primary": "#ffeff1",
+                        "tertiary-fixed-dim": "#00e5ee",
+                        "surface-bright": "#f9f6f5",
+                        "on-primary-fixed": "#000000",
+                        "surface-dim": "#d6d4d3",
+                        "tertiary-fixed": "#00f4fe",
+                        "tertiary-dim": "#00595d",
+                        "primary-dim": "#9f004d",
+                        "on-error": "#ffefef",
+                        "secondary-fixed-dim": "#e7d800",
+                        "on-primary-fixed-variant": "#5d002a",
+                        "surface": "#f9f6f5",
+                        "on-tertiary-fixed-variant": "#006266",
+                        "on-surface-variant": "#5c5b5b",
+                        "surface-tint": "#b50058",
+                        "secondary-dim": "#575100",
+                        "on-primary-container": "#4c0021",
+                        "inverse-primary": "#ff4a8d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Epilogue", "sans-serif"],
+                        "body": ["Be Vietnam Pro", "sans-serif"],
+                        "label": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Signature Texture: Halftone Dither */
+        .bg-halftone-primary {
+            background-color: theme('colors.primary');
+            background-image: radial-gradient(circle, theme('colors.primary-dim') 2px, transparent 2.5px);
+            background-size: 8px 8px;
+        }
+        .bg-halftone-secondary {
+            background-color: theme('colors.secondary-container');
+            background-image: radial-gradient(circle, theme('colors.secondary-dim') 2px, transparent 2.5px);
+            background-size: 8px 8px;
+            background-blend-mode: overlay;
+        }
+        .bg-halftone-surface {
+            background-image: radial-gradient(circle, theme('colors.surface-variant') 1px, transparent 1.5px);
+            background-size: 6px 6px;
+        }
+        
+        /* Ambient Shadows: Hard Offset */
+        .shadow-offset-black {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        }
+        .shadow-offset-black-sm {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+        
+        /* Prevent scrollbar overlapping fixed nav */
+        body { padding-bottom: 120px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-x-hidden min-h-screen relative bg-halftone-surface">
+<!-- JSON Component: TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f9f6f5] dark:bg-neutral-900 border-b-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<!-- Profile Avatar with Halo -->
+<div class="bg-secondary-container p-1 rounded-lg border-2 border-black inline-block -rotate-3 hover:rotate-0 transition-transform">
+<img alt="Player avatar with bold 4px black stroke and yellow burst halo" class="w-12 h-12 object-cover rounded-lg border-4 border-black bg-surface" data-alt="Comic style close-up of a confident female gamer character with spiky pink hair and tech goggles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVAIiMHpyOA1Rnuf6T0LdGpWAd7m09RHNZrmSwjv4TnD3WAd76VGP3W2qlEaccjg8MwohnTf5E-UOehHMyomVmdLimgPgy8x1tjn0ng69OLuMUz_rZY_Rd8yAOPbhSz8MXxhEVFDDrxhETwPRlZdUaeGZ2eueuFElsP7YR-yRcRqxAD6rRc6i2pTGkF3m8Ymj8oCJlzvcpzl2oPGfrW3iwksWQnyfUMgGJ7FjD08Xh0yKK1kbt5_R_zbLh1M0T0jE1sXbvmO4kf1Tl"/>
+</div>
+<div>
+<h1 class="text-[#FF007F] dark:text-[#ff709e] font-['Epilogue'] uppercase tracking-tighter font-black text-2xl italic">CALL BREAK KINETIC</h1>
+<p class="font-label text-xs font-bold text-on-surface uppercase tracking-widest mt-[-4px]">Level 42 • Rookie</p>
+</div>
+</div>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-4">
+<button class="bg-surface-container-high border-4 border-black p-2 rounded-lg hover:skew-x-[-2deg] transition-transform active:translate-y-1 active:shadow-none shadow-offset-black-sm group">
+<span class="material-symbols-outlined text-black font-black block group-hover:text-primary transition-colors">account_balance_wallet</span>
+</button>
+<button class="bg-surface-container-high border-4 border-black p-2 rounded-lg hover:skew-x-[-2deg] transition-transform active:translate-y-1 active:shadow-none shadow-offset-black-sm group">
+<span class="material-symbols-outlined text-black font-black block group-hover:text-primary transition-colors">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="max-w-4xl mx-auto pt-32 px-4 relative z-10">
+<!-- Decorative Background Element -->
+<div class="absolute top-40 right-[-10%] w-64 h-64 bg-tertiary-container rounded-full blur-3xl opacity-30 pointer-events-none"></div>
+<!-- HERO ACTION: CREATE ROOM -->
+<section class="mb-12 relative z-20">
+<!-- Decorative Image -->
+<img alt="Card Suit Icon" class="absolute -top-6 -left-6 w-16 h-16 object-contain z-30 -rotate-12 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" data-alt="Stylized vector graphic of a playing card spade symbol in solid black with halftone texturing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyxUVR9P19tQm9sXoPsaOw0ELqMOscDeR0ZlukZMQYDDiVYpCLKR3WlUCmjmMq-FfM5pAIJoI42tag-E-z5JO-8ubYI9XUh4aaWFmFsDWGW7JGQAIMqtsKeCwMm985Wbrz2nY9M5G-Z1mcK6yVs3oLNH3Yk_u0XNwR35qC-jbzn0qL0lX4p8Ck8hy0ou0EAVFxEC5y1MM0mFeIKAjA99V195DuJj_PXNRx9N5Ld666mmFzN42Gki2Rz0S3Gh2pfQTphZLPGZAs-Bd7"/>
+<button class="w-full bg-halftone-secondary border-4 border-black rounded-xl p-8 shadow-offset-black hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[8px] active:translate-x-[8px] active:shadow-none transition-all flex flex-col md:flex-row items-center justify-between group -rotate-1">
+<div class="text-left flex-1 mb-4 md:mb-0">
+<div class="inline-block bg-black text-white font-label text-xs font-bold uppercase px-2 py-1 mb-2 -skew-x-6">Instant Action</div>
+<h2 class="font-headline font-black text-4xl md:text-5xl uppercase tracking-tighter text-on-primary-fixed group-hover:text-primary transition-colors">Host A Battle</h2>
+<p class="font-body font-semibold text-on-surface-variant mt-2 text-lg">Set the rules, invite friends, and crush them.</p>
+</div>
+<div class="bg-primary text-on-primary border-4 border-black rounded-full w-20 h-20 flex items-center justify-center group-hover:rotate-12 transition-transform shadow-offset-black-sm">
+<span class="material-symbols-outlined text-4xl font-black" style="font-variation-settings: 'FILL' 1;">add</span>
+</div>
+</button>
+</section>
+<!-- BATTLE ROOMS LIST -->
+<section class="relative z-20">
+<div class="flex items-end justify-between mb-8 border-b-4 border-black pb-2">
+<h2 class="font-headline font-black text-3xl uppercase tracking-tighter text-on-surface">Battle Rooms</h2>
+<button class="font-label text-sm font-bold uppercase flex items-center gap-1 hover:text-primary transition-colors pb-1">
+<span class="material-symbols-outlined text-lg">filter_list</span> Filter
+                </button>
+</div>
+<div class="flex flex-col gap-6">
+<!-- Room Card 1 (High Priority/Active) -->
+<div class="bg-primary-container border-4 border-black rounded-xl p-5 shadow-offset-black flex flex-col md:flex-row justify-between items-start md:items-center gap-4 rotate-1 hover:-translate-y-1 transition-transform">
+<div class="flex items-center gap-4">
+<div class="bg-surface border-4 border-black w-14 h-14 rounded-lg flex items-center justify-center -rotate-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+<img alt="Spade" class="w-8 h-8 object-contain" data-alt="Stylized vector graphic of a playing card club symbol in solid black with halftone texturing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2vyVy3pXRSqRAJUQV1uqJ_Z5hslOLRsD4sNiY6FLdaFt_SJAgQhRPRKYElxgH1SCiFfwX0V-LdQDNyGjCLQW7B5hRh5Kbsp9z1inh2imhAgQGbiZ_rAaS_qPEmQHxTRKON_3-5BUmx4YEYTks97mV2OPULo_q1CMcaNKqDOhoxWgfAYNVpfvBwuvoLefo1pMZboRJvS8DnZjcZ-mjlG1xXq6YxOg5r6pf1ImSjLOBWcxIF7XC36SvEoXloYKaP5Gtk3J-NUyHCOZH"/>
+</div>
+<div>
+<div class="font-label text-xs font-bold bg-black text-white inline-block px-2 py-0.5 rounded-sm uppercase tracking-wider mb-1">High Stakes</div>
+<h3 class="font-headline font-bold text-2xl uppercase tracking-tight text-on-surface">Room #A8B2</h3>
+<p class="font-body text-sm font-medium text-on-surface-variant">Standard Rules • Pro Tier</p>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto gap-6 mt-2 md:mt-0 bg-surface-container-lowest md:bg-transparent p-3 md:p-0 rounded-lg border-2 border-black md:border-0">
+<div class="text-center md:text-right">
+<span class="font-label text-xs uppercase font-bold text-on-surface-variant block">Players</span>
+<span class="font-headline font-black text-xl text-primary block">3/4</span>
+</div>
+<button class="bg-black text-white border-4 border-black rounded font-headline font-black uppercase text-lg px-8 py-3 hover:bg-primary hover:text-on-primary transition-colors active:scale-95 shadow-[4px_4px_0px_0px_theme('colors.secondary-fixed')]">
+                            JOIN
+                        </button>
+</div>
+</div>
+<!-- Room Card 2 -->
+<div class="bg-surface-container-low border-4 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:-translate-y-1 transition-transform -rotate-1">
+<div class="flex items-center gap-4">
+<div class="bg-surface-container-highest border-4 border-black w-14 h-14 rounded-lg flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+<img alt="Diamond" class="w-8 h-8 object-contain" data-alt="Stylized vector graphic of a playing card diamond symbol in solid black with halftone texturing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuj5Jq-ihNKnvSR3dcFx1mOt_byiCS4gSA9LpMijC5eaFREQo2bXHuISYjJ6bv5Yw6bxHJUoXBBfuhKj_4OQMACfX54TrO0Lvt3V4EXDCtEvs_i8qv1mCs3erSr2Ct2iA4AQ8ka3E_NpKCsUFVeUrLtOPY5y9gM1BgssL3JKgqXEkAaCI8kaL0Cu1PsYj_sIOddV0WKRCCksQQEKNZ_LT_6XBLPnfLmpufLZHwZQ6vxcYjWwRsWNfnsJDCqhqPujX1doo2BYZMVVgF"/>
+</div>
+<div>
+<h3 class="font-headline font-bold text-2xl uppercase tracking-tight text-on-surface">Room #X99F</h3>
+<p class="font-body text-sm font-medium text-on-surface-variant">Quick Match • Casual</p>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto gap-6 mt-2 md:mt-0 bg-surface-container-lowest md:bg-transparent p-3 md:p-0 rounded-lg border-2 border-black md:border-0">
+<div class="text-center md:text-right">
+<span class="font-label text-xs uppercase font-bold text-on-surface-variant block">Players</span>
+<span class="font-headline font-black text-xl text-on-surface block">2/4</span>
+</div>
+<button class="bg-surface text-on-surface border-4 border-black rounded font-headline font-black uppercase text-lg px-8 py-3 hover:bg-black hover:text-white transition-colors active:scale-95 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                            JOIN
+                        </button>
+</div>
+</div>
+<!-- Room Card 3 -->
+<div class="bg-surface-container border-4 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:-translate-y-1 transition-transform">
+<div class="flex items-center gap-4">
+<div class="bg-surface-container-highest border-4 border-black w-14 h-14 rounded-lg flex items-center justify-center rotate-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+<span class="material-symbols-outlined text-3xl font-black">casino</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-2xl uppercase tracking-tight text-on-surface">Room #L2P1</h3>
+<p class="font-body text-sm font-medium text-on-surface-variant">Custom Rules • Novice</p>
+</div>
+</div>
+<div class="flex items-center justify-between w-full md:w-auto gap-6 mt-2 md:mt-0 bg-surface-container-lowest md:bg-transparent p-3 md:p-0 rounded-lg border-2 border-black md:border-0">
+<div class="text-center md:text-right">
+<span class="font-label text-xs uppercase font-bold text-on-surface-variant block">Players</span>
+<span class="font-headline font-black text-xl text-on-surface block">1/4</span>
+</div>
+<button class="bg-surface text-on-surface border-4 border-black rounded font-headline font-black uppercase text-lg px-8 py-3 hover:bg-black hover:text-white transition-colors active:scale-95 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                            JOIN
+                        </button>
+</div>
+</div>
+</div>
+<div class="mt-8 text-center">
+<button class="font-label font-bold uppercase text-sm border-2 border-black rounded-full px-6 py-2 hover:bg-black hover:text-white transition-colors">
+                    Load More Rooms
+                </button>
+</div>
+</section>
+</main>
+<!-- JSON Component: BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-4 bg-[#f9f6f5] dark:bg-neutral-900 border-t-[4px] border-black rounded-t-[3rem] md:hidden">
+<!-- Item 1: Lobby (ACTIVE) -->
+<button class="flex flex-col items-center justify-center bg-[#FF007F] text-white rounded-full px-6 py-2 border-2 border-black -translate-y-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-['Epilogue'] text-[12px] font-bold uppercase hover:skew-x-[-2deg] transition-transform active:translate-y-1 active:shadow-none">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+            Lobby
+        </button>
+<!-- Item 2: Leaderboard (INACTIVE) -->
+<button class="flex flex-col items-center justify-center text-black dark:text-white opacity-70 font-['Epilogue'] text-[12px] font-bold uppercase hover:text-[#FF007F] transition-colors hover:skew-x-[-2deg] active:scale-95">
+<span class="material-symbols-outlined mb-1">emoji_events</span>
+            Leaderboard
+        </button>
+<!-- Item 3: Shop (INACTIVE) -->
+<button class="flex flex-col items-center justify-center text-black dark:text-white opacity-70 font-['Epilogue'] text-[12px] font-bold uppercase hover:text-[#FF007F] transition-colors hover:skew-x-[-2deg] active:scale-95">
+<span class="material-symbols-outlined mb-1">shopping_bag</span>
+            Shop
+        </button>
+<!-- Item 4: Profile (INACTIVE) -->
+<button class="flex flex-col items-center justify-center text-black dark:text-white opacity-70 font-['Epilogue'] text-[12px] font-bold uppercase hover:text-[#FF007F] transition-colors hover:skew-x-[-2deg] active:scale-95">
+<span class="material-symbols-outlined mb-1">person</span>
+            Profile
+        </button>
+</nav>
+<!-- Desktop Nav Cluster (Hidden on mobile, fulfilling responsive pivot requirement vaguely if needed, but primarily relying on BottomBar for this mobile-first view as requested by typical app lobby patterns. Adding a placeholder side cluster for larger screens to meet "full nav cluster" constraint if viewed on desktop) -->
+<aside class="hidden md:flex fixed right-8 top-1/2 -translate-y-1/2 flex-col gap-4 z-40 bg-surface-container-high border-4 border-black p-4 rounded-xl shadow-offset-black">
+<button class="bg-[#FF007F] text-white border-2 border-black p-3 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-transform group relative">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-black text-white font-label text-xs uppercase px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Lobby</span>
+</button>
+<button class="bg-surface text-on-surface border-2 border-black p-3 rounded-lg hover:-translate-y-1 transition-transform hover:text-primary group relative">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-black text-white font-label text-xs uppercase px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Leaderboard</span>
+</button>
+<button class="bg-surface text-on-surface border-2 border-black p-3 rounded-lg hover:-translate-y-1 transition-transform hover:text-primary group relative">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-black text-white font-label text-xs uppercase px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Shop</span>
+</button>
+<button class="bg-surface text-on-surface border-2 border-black p-3 rounded-lg hover:-translate-y-1 transition-transform hover:text-primary group relative">
+<span class="material-symbols-outlined">person</span>
+<span class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-black text-white font-label text-xs uppercase px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">Profile</span>
+</button>
+</aside>
+</body></html>

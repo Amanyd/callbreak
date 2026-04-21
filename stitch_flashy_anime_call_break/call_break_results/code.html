@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Call Break - Game Over</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;900&amp;family=Be+Vietnam+Pro:wght@400;600&amp;family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-surface-variant": "#5c5b5b",
+                  "on-primary-fixed": "#000000",
+                  "surface-container-high": "#e4e2e1",
+                  "tertiary": "#00666a",
+                  "on-secondary-fixed": "#464000",
+                  "secondary-dim": "#575100",
+                  "outline": "#787676",
+                  "on-primary": "#ffeff1",
+                  "surface-dim": "#d6d4d3",
+                  "on-error": "#ffefef",
+                  "on-tertiary": "#c9fcff",
+                  "primary-fixed-dim": "#ff5290",
+                  "surface-container": "#eae7e7",
+                  "on-primary-fixed-variant": "#5d002a",
+                  "surface-tint": "#b50058",
+                  "inverse-surface": "#0e0e0e",
+                  "surface-container-low": "#f3f0ef",
+                  "surface-variant": "#dfdcdc",
+                  "surface-container-highest": "#dfdcdc",
+                  "on-background": "#2f2f2e",
+                  "on-primary-container": "#4c0021",
+                  "on-tertiary-fixed-variant": "#006266",
+                  "primary-fixed": "#ff709e",
+                  "surface": "#f9f6f5",
+                  "inverse-on-surface": "#9e9c9c",
+                  "on-tertiary-fixed": "#004346",
+                  "surface-container-lowest": "#ffffff",
+                  "error": "#b41340",
+                  "error-dim": "#a70138",
+                  "primary-dim": "#9f004d",
+                  "background": "#f9f6f5",
+                  "secondary-container": "#f7e600",
+                  "on-secondary": "#fff5a0",
+                  "on-secondary-fixed-variant": "#645d00",
+                  "surface-bright": "#f9f6f5",
+                  "tertiary-fixed": "#00f4fe",
+                  "tertiary-dim": "#00595d",
+                  "outline-variant": "#afadac",
+                  "on-surface": "#2f2f2e",
+                  "inverse-primary": "#ff4a8d",
+                  "secondary-fixed": "#f7e600",
+                  "on-tertiary-container": "#00575b",
+                  "primary": "#b50058",
+                  "on-error-container": "#510017",
+                  "tertiary-container": "#00f4fe",
+                  "tertiary-fixed-dim": "#00e5ee",
+                  "secondary-fixed-dim": "#e7d800",
+                  "on-secondary-container": "#5a5300",
+                  "secondary": "#645d00",
+                  "primary-container": "#ff709e",
+                  "error-container": "#f74b6d"
+          },
+          "borderRadius": {
+                  "DEFAULT": "1rem",
+                  "lg": "2rem",
+                  "xl": "3rem",
+                  "full": "9999px"
+          },
+          "spacing": {},
+          "fontFamily": {
+                  "headline": [
+                          "Epilogue"
+                  ],
+                  "body": [
+                          "Be Vietnam Pro"
+                  ],
+                  "label": [
+                          "Plus Jakarta Sans"
+                  ]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    /* Halftone Dither Pattern */
+    .bg-halftone {
+      background-image: radial-gradient(circle, #9f004d 2px, transparent 2px);
+      background-size: 8px 8px;
+    }
+    
+    /* Hard Offset Shadow for Components */
+    .shadow-hard {
+      box-shadow: 8px 8px 0px 0px rgba(47, 47, 46, 0.2);
+    }
+    
+    /* Active Button Click Effect (handled via Tailwind active: classes) */
+    
+    /* Text Stroke for Comic Titles */
+    .text-stroke-heavy {
+      -webkit-text-stroke: 4px #000000;
+      color: #ffeff1;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-background font-body min-h-screen flex flex-col items-center justify-center relative overflow-hidden pb-32">
+<!-- Background Decorative Suits -->
+<div class="absolute inset-0 pointer-events-none opacity-20 flex items-center justify-center overflow-hidden z-0">
+<span class="material-symbols-outlined text-[30rem] text-primary rotate-12 absolute -top-32 -left-32">playing_cards</span>
+<span class="material-symbols-outlined text-[20rem] text-tertiary -rotate-12 absolute bottom-10 right-10">cards</span>
+</div>
+<main class="w-full max-w-lg px-4 sm:px-6 relative z-10 flex flex-col gap-8 items-center mt-12">
+<!-- Header: Victory Burst -->
+<header class="relative w-full flex justify-center mt-8">
+<!-- Burst Background -->
+<div class="absolute -inset-8 bg-secondary-container rounded-[4rem] border-4 border-on-primary-fixed -rotate-3 z-0"></div>
+<div class="absolute -inset-8 bg-halftone rounded-[4rem] opacity-30 -rotate-3 z-0"></div>
+<!-- Title -->
+<h1 class="relative z-10 font-headline font-black text-6xl tracking-tighter uppercase text-center text-stroke-heavy transform -rotate-2">
+        VICTORY!
+      </h1>
+</header>
+<!-- Winner Announcement -->
+<section class="relative w-full flex flex-col items-center mt-12">
+<!-- Avatar -->
+<div class="relative z-10 w-40 h-40 rounded-lg border-[4px] border-on-primary-fixed overflow-hidden bg-secondary-container shadow-[8px_8px_0px_0px_#000000]">
+<img alt="Anime Style Female Avatar" class="w-full h-full object-cover" data-alt="vibrant anime style illustration of a female character with pink hair, wearing futuristic sporty clothing, dynamic lighting, flat colors, graphic novel style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6tN640D5n7oAwqzedGbLby0fI-DocBWR6SoRydJIaddUdPEdiJNtQaweK9gYpQ0yFFkalQIHbOvMm43kPx_leyNsewePa1slrr9uAeDNFoHNlNW03YkULGM_v_NnKy_StmRs-yAfrzI-6QhrlHh-m-LdHtJEgJYmM6WktTkoGYZUh-j3VyFQOTHolgD5ZfqrIkTvL-fgAnDha3_liiiPkHRdUJP-wabsA_wwA8krjnnl7MvAK-LM3KrnSH3xgZ8BUV1Ia95Nl9qGx"/>
+</div>
+<!-- Champion Badge -->
+<div class="absolute top-32 z-20 bg-primary text-on-primary font-headline font-black uppercase tracking-tight text-xl px-6 py-2 border-[3px] border-on-primary-fixed rounded-full shadow-[4px_4px_0px_0px_#000000] -rotate-2">
+        CHAMPION
+      </div>
+<!-- Score Bubble -->
+<div class="absolute -right-4 top-0 z-30 bg-tertiary-container border-[4px] border-on-primary-fixed rounded-[2rem] px-6 py-4 transform rotate-6 shadow-[6px_6px_0px_0px_#000000]">
+<div class="font-label font-bold text-on-tertiary-container text-sm uppercase">Total Score</div>
+<div class="font-headline font-black text-4xl text-on-primary-fixed tracking-tighter">420</div>
+</div>
+</section>
+<!-- Results Table -->
+<section class="w-full mt-8 flex flex-col gap-4">
+<!-- Row 1: Winner (You) -->
+<div class="relative bg-primary-container border-[4px] border-on-primary-fixed rounded-xl p-4 flex items-center justify-between transform -rotate-1 shadow-[8px_8px_0px_0px_#000000] z-20">
+<div class="absolute inset-0 bg-halftone opacity-20 rounded-xl pointer-events-none"></div>
+<div class="flex items-center gap-4 relative z-10">
+<div class="font-headline font-black text-3xl text-on-primary-fixed w-8 text-center">1</div>
+<div class="w-12 h-12 rounded-lg border-2 border-on-primary-fixed overflow-hidden bg-surface">
+<img alt="You Avatar" class="w-full h-full object-cover" data-alt="vibrant anime style illustration of a female character with pink hair, headshot, flat colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuMvDfXBnPqCuwap6OZKZDG0z7UZ8Ca2n79Xikn7yzzVMJZLUEBktWLwqPnoMu18Ucc6EpuP-zXjxiTa1uQ7fkjfrqrkDau1z31jOnwVLbt628hCLQkRe1C9hoyuTYX3QhDClxZQ6A6t-uDEYxMIX9Nq3JrowGw6fmhlwMpsnu5wKP_vBiyoOInEOc0Gi4YZwgUVcrxAf46MTnGYlxqh5HMZGpcuP8SpMA16x6kmARJz08IDNVRxnhm2fwTJbIaofIrGRk6MDDwf6V"/>
+</div>
+<div class="font-headline font-bold text-xl text-on-primary-fixed uppercase">You</div>
+</div>
+<div class="font-headline font-black text-2xl text-on-primary-fixed relative z-10">420</div>
+</div>
+<!-- Row 2 -->
+<div class="bg-surface-container border-[4px] border-on-primary-fixed rounded-xl p-4 flex items-center justify-between transform rotate-1 shadow-[8px_8px_0px_0px_rgba(47,47,46,0.2)]">
+<div class="flex items-center gap-4">
+<div class="font-headline font-black text-2xl text-on-surface-variant w-8 text-center">2</div>
+<div class="w-12 h-12 rounded-lg border-2 border-on-primary-fixed overflow-hidden bg-surface-container-highest">
+<img alt="Akira Avatar" class="w-full h-full object-cover grayscale opacity-80" data-alt="anime style illustration of a cool guy character with spiky blue hair, headshot, flat colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcTQCffUIJuJ1suWgGQgRjJHPu-bzYoAoSp1u2v5xnzOllV_DZLakOHJrF6LbdpYkpZ2gwQ_sC4R_9EsVsNOmHhgO7bTPl4qNa13YV0hIyCHZSG4aIdsvMh5JbhHHAdv-ZWFb9XAmhHVqw0d7ZOfS0qAOTvqTPZ1AC-NaQqiIpC88f3Uz7-XRMOx-aB3jabnQ5bubd0q_2UAxudjHjTemTTKw9SdJ0BHRD67OWsk_rzFyJ6GSG16uvOBPZQU6REPn6tV1YAZan0fZX"/>
+</div>
+<div class="font-headline font-bold text-lg text-on-background uppercase">Akira</div>
+</div>
+<div class="font-headline font-bold text-xl text-on-background">380</div>
+</div>
+<!-- Row 3 -->
+<div class="bg-surface-container border-[4px] border-on-primary-fixed rounded-xl p-4 flex items-center justify-between transform -rotate-1 shadow-[8px_8px_0px_0px_rgba(47,47,46,0.2)]">
+<div class="flex items-center gap-4">
+<div class="font-headline font-black text-2xl text-on-surface-variant w-8 text-center">3</div>
+<div class="w-12 h-12 rounded-lg border-2 border-on-primary-fixed overflow-hidden bg-surface-container-highest">
+<img alt="Yuki Avatar" class="w-full h-full object-cover grayscale opacity-80" data-alt="anime style illustration of a serious female character with short black hair, headshot, flat colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNPaKUd51eGF0r6IRAIQnEVzO_nz7gi4m0YZPVWeESQytJeJOYFUG5KDGPUj1gjTefI4-eLNRfdxy2uZIPbRYrohBS0N2BvcjievNhs0G1AlX9vk3wD4nt-xuDMds5hAqpnTLe3Q2M6Qpn7LPJeD1dn-EM--3OkqUmy2s87BvA04RK_OWAjG-Ny4Kk82yWHtu0SCJkWZqKm0Qz5JqjAjZvjJbP2JvDq0RXLkEcqMjLYVY5m0kZsC7PUMB5FpyymybopZontiP_TCPa"/>
+</div>
+<div class="font-headline font-bold text-lg text-on-background uppercase">Yuki</div>
+</div>
+<div class="font-headline font-bold text-xl text-on-background">310</div>
+</div>
+<!-- Row 4 -->
+<div class="bg-surface-container border-[4px] border-on-primary-fixed rounded-xl p-4 flex items-center justify-between transform rotate-1 shadow-[8px_8px_0px_0px_rgba(47,47,46,0.2)]">
+<div class="flex items-center gap-4">
+<div class="font-headline font-black text-2xl text-on-surface-variant w-8 text-center">4</div>
+<div class="w-12 h-12 rounded-lg border-2 border-on-primary-fixed overflow-hidden bg-surface-container-highest">
+<img alt="Ken Avatar" class="w-full h-full object-cover grayscale opacity-80" data-alt="anime style illustration of an older male character with glasses and grey hair, headshot, flat colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6jk8q4GeRlZ3YTHOSAoZVWV1Njvje9Kk5BhhCzZCwFwDHBNyZvbpOD-rV2efjzVO22otl0BL-xRRvpsn1w1jffhtpqE7LxamBimVI17JC1Fc8st0uvBusTZ1EmSCxfTtYUcA8tyOMGFOBPDrEMf63zsfNx4q5FbEMe6-7HVAAXAxWE4XbjkvbND46iqH2QLHSPn0hO4XSXTfpOtPGHpJ53l-esIS1uu_JT_As57Oagzwg-Lj0XMQSg-ZwCK7OvQJZ6bECY04woR4i"/>
+</div>
+<div class="font-headline font-bold text-lg text-on-background uppercase">Ken</div>
+</div>
+<div class="font-headline font-bold text-xl text-on-background">150</div>
+</div>
+</section>
+<!-- Actions -->
+<div class="w-full flex flex-col gap-4 mt-8">
+<button class="w-full bg-primary text-on-primary font-headline font-black text-2xl uppercase py-4 rounded-xl border-[4px] border-on-primary-fixed shadow-[8px_8px_0px_0px_#000000] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all relative overflow-hidden group">
+<div class="absolute inset-0 bg-halftone opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
+<span class="relative z-10 flex items-center justify-center gap-2">
+          PLAY AGAIN
+          <span class="material-symbols-outlined font-black">replay</span>
+</span>
+</button>
+<button class="w-full bg-surface text-on-background font-headline font-black text-xl uppercase py-4 rounded-xl border-[4px] border-on-primary-fixed shadow-[8px_8px_0px_0px_#000000] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all hover:bg-surface-container">
+        LOBBY
+      </button>
+</div>
+</main>
+<!-- TopAppBar Rendered for global navigation consistency, but adapted for Game Over context -->
+<div class="fixed top-0 left-0 w-full z-50">
+<nav class="bg-[#f9f6f5] dark:bg-slate-950 flex justify-between items-center w-full px-6 py-4 docked full-width top-0 border-b-4 border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
+<div class="flex items-center gap-4">
+<span class="font-['Epilogue'] uppercase tracking-tighter font-black text-3xl text-black dark:text-white italic">CALL BREAK</span>
+</div>
+<div class="flex items-center gap-4 text-[#b50058] dark:text-[#ff709e]">
+<button class="hover:bg-[#ff709e] hover:text-white transition-all active:translate-y-1 active:shadow-none p-2 rounded-lg border-2 border-transparent">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+</button>
+<button class="hover:bg-[#ff709e] hover:text-white transition-all active:translate-y-1 active:shadow-none p-2 rounded-lg border-2 border-transparent">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">help</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-on-primary-fixed overflow-hidden bg-surface-container-highest ml-2">
+<img alt="Player Profile" class="w-full h-full object-cover" data-alt="small headshot of anime female character with pink hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtAdttYnQ8Tq1dmhxdcLOQBC1w_nm9-e8nnJ0PVQbeX2n4YHGbU_0QrQV0jdMvsbH5g3uG9XG6YtVX3mYBWhX7yBoKVMUFHtqDoFkNxU0lxesICt_Ci2zzJ7GC4jzrYVlTEUT-I0E8bIIt0RKRHlsT5yPy7ZOoVMoLtkL-ZY2F9z1JawdFTAI3ASujQJmzmFgGspBHD_b3n-n0BRecjqUHt-48tMCB-OQRMFFfUgJ41DBPD59opH7lHSVXbQznR2wiA_S0siWo88Gc"/>
+</div>
+</div>
+</nav>
+</div>
+<!-- BottomNavBar Suppressed based on semantic rules: Game Over is a transactional/success screen. -->
+</body></html>

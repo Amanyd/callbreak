@@ -72,6 +72,14 @@ function CardBack() {
 
 export function GameScreen({ gameState }: Props) {
   const socket = useSocket();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [selectedBid, setSelectedBid] = useState<number | 'pass' | null>(null);
   const [selectedSuit, setSelectedSuit] = useState<Suit | null>(null);
   const [trickWinner, setTrickWinner] = useState<string | null>(null);
@@ -162,7 +170,8 @@ export function GameScreen({ gameState }: Props) {
   });
 
   const handCount = sortedHand.length;
-  const fanSpread = Math.min(handCount * 2.5, 30);
+  // On mobile: more spread (wider arc). On desktop: tighter fan.
+  const fanSpread = isMobile ? Math.min(handCount * 5.5, 65) : Math.min(handCount * 2.5, 30);
   const startAngle = -fanSpread / 2;
 
   // Slide target position for trick-win animation

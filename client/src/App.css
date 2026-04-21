@@ -996,3 +996,51 @@
   animation: dealCardAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
   display: inline-block;
 }
+
+/* ─── Mobile Responsiveness ────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Make the board smaller */
+  .game-layout {
+    flex-direction: column;
+  }
+  .game-table-wrapper {
+    min-height: 50vh;
+  }
+  .game-table {
+    min-height: 40vh;
+    padding: 0.5rem;
+  }
+  
+  /* Break the sidebar into a scrolling bottom-pane */
+  .scoreboard {
+    width: 100%;
+    border-left: none;
+    border-top: 4px solid var(--stroke-color);
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  /* Bring cars closer and smaller */
+  .playing-card {
+    width: 64px;
+    height: 90px;
+    margin-left: -40px;
+  }
+  
+  /* Adjust player positions for the smaller table */
+  .table-player.top { top: 0; }
+  .table-player.bottom { bottom: 0; }
+  .table-player.left { left: 0; }
+  .table-player.right { right: 0; }
+  
+  .player-avatar-img img {
+    width: 48px;
+    height: 48px;
+  }
+  
+  /* Make the fanning arc fit the smaller area */
+  .my-hand {
+    min-height: 100px;
+    padding: 1rem 0.5rem 0.25rem;
+  }
+}

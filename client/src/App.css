@@ -593,7 +593,7 @@
   user-select: none;
   box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
   flex-shrink: 0;
-  margin-left: -28px;
+  margin-left: -50px;
 }
 
 .playing-card:first-child {

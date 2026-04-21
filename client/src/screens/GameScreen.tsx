@@ -162,7 +162,7 @@ export function GameScreen({ gameState }: Props) {
   });
 
   const handCount = sortedHand.length;
-  const fanSpread = Math.min(handCount * 4, 50);
+  const fanSpread = Math.min(handCount * 2.5, 30);
   const startAngle = -fanSpread / 2;
 
   // Slide target position for trick-win animation

@@ -17,6 +17,12 @@ function App() {
   const [playerName, setPlayerName] = useState('');
   const [nameSet, setNameSet] = useState(false);
 
+  useEffect(() => {
+    if (window.screen && window.screen.orientation && 'lock' in window.screen.orientation) {
+      (window.screen.orientation as any).lock('landscape').catch((e: any) => console.log('Orientation lock unavailable:', e));
+    }
+  }, []);
+
   // Navigate to a screen and push browser history
   const navigateTo = useCallback((newScreen: Screen) => {
     setScreen(newScreen);

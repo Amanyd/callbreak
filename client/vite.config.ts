@@ -15,7 +15,7 @@ export default defineConfig({
         description: 'Multiplayer Callbreak Card Game',
         theme_color: '#1a1b1f',
         display: 'fullscreen',
-        orientation: 'portrait',
+        orientation: 'landscape',
         icons: [
           {
             src: 'favicon.svg',

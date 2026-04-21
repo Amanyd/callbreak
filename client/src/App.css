@@ -997,50 +997,36 @@
   display: inline-block;
 }
 
-/* ─── Mobile Responsiveness ────────────────────────────────── */
-@media (max-width: 600px) {
-  /* Make the board smaller */
-  .game-layout {
-    flex-direction: column;
+/* ─── Mobile Responsiveness (Landscape Default) ────────────────────────────────── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .app {
+    overflow: hidden;
   }
-  .game-table-wrapper {
-    min-height: 50vh;
-  }
-  .game-table {
-    min-height: 40vh;
-    padding: 0.5rem;
-  }
-  
-  /* Break the sidebar into a scrolling bottom-pane */
-  .scoreboard {
-    width: 100%;
-    border-left: none;
-    border-top: 4px solid var(--stroke-color);
-    max-height: 150px;
-    overflow-y: auto;
+  .main-content {
+    /* Scale the entire desktop-style UI down linearly to fit in landscape mobile screens without restacking */
+    transform: scale(0.65);
+    transform-origin: top center;
+    width: 153%; /* 1 / 0.65 to ensure width spans the whole screen *after* scaling */
+    height: 153%; /* 1 / 0.65 to ensure height spans */
   }
 
-  /* Bring cars closer and smaller */
-  .playing-card {
-    width: 64px;
-    height: 90px;
-    margin-left: -40px;
+  .game-layout {
+    /* Retain original sidebar placement! */
+    flex-direction: row;
   }
-  
-  /* Adjust player positions for the smaller table */
-  .table-player.top { top: 0; }
-  .table-player.bottom { bottom: 0; }
-  .table-player.left { left: 0; }
-  .table-player.right { right: 0; }
-  
-  .player-avatar-img img {
-    width: 48px;
-    height: 48px;
+
+  /* Reduce table padding to make room for full grid */
+  .game-table {
+    padding: 0.25rem;
+    min-height: 80%;
   }
-  
-  /* Make the fanning arc fit the smaller area */
-  .my-hand {
-    min-height: 100px;
-    padding: 1rem 0.5rem 0.25rem;
+
+  /* Make scoreboard thin but tall to match */
+  .scoreboard {
+    width: 280px;
+    border-top: none;
+    border-left: 4px solid var(--stroke-color);
+    max-height: 100%;
   }
 }
+

@@ -170,8 +170,8 @@ export function GameScreen({ gameState }: Props) {
   });
 
   const handCount = sortedHand.length;
-  // On mobile: more spread (wider arc). On desktop: tighter fan.
-  const fanSpread = isMobile ? Math.min(handCount * 5.5, 65) : Math.min(handCount * 2.5, 30);
+  // Make the cars arch more arched but fan tighter, bringing ends closer
+  const fanSpread = isMobile ? Math.min(handCount * 3.5, 45) : Math.min(handCount * 1.5, 20);
   const startAngle = -fanSpread / 2;
 
   // Slide target position for trick-win animation

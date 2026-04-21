@@ -14,6 +14,8 @@ export default defineConfig({
         short_name: 'BreakMeBad',
         description: 'Multiplayer Callbreak Card Game',
         theme_color: '#1a1b1f',
+        display: 'fullscreen',
+        orientation: 'portrait',
         icons: [
           {
             src: 'favicon.svg',

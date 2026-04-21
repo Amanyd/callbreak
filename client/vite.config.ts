@@ -8,19 +8,19 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons.svg'],
+      includeAssets: ['icon.webp'],
       manifest: {
-        name: 'Break Me Bad!!',
-        short_name: 'BreakMeBad',
+        name: 'BAD!!',
+        short_name: 'BAD!!',
         description: 'Multiplayer Callbreak Card Game',
         theme_color: '#1a1b1f',
         display: 'fullscreen',
         orientation: 'landscape',
         icons: [
           {
-            src: 'favicon.svg',
+            src: 'icon.webp',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/webp',
             purpose: 'any maskable'
           }
         ]

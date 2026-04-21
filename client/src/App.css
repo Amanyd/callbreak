@@ -998,7 +998,7 @@
 }
 
 /* ─── Mobile Responsiveness (Landscape Default) ────────────────────────────────── */
-@media (max-height: 500px) and (max-width: 900px) {
+@media (max-width: 1000px) {
   .app {
     overflow: hidden;
   }

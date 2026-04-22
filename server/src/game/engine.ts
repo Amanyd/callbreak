@@ -294,28 +294,45 @@ export function isGameOver(state: GameState): boolean {
 }
 
 /** Get final rankings */
-export function getFinalRankings(state: GameState): { playerId: string; totalScore: number; rank: number; seat: number }[] {
-  const sorted = [...state.players].sort((a, b) => b.score - a.score);
-  
+export function getFinalRankings(state: GameState): { playerId: string; totalScore: number; rank: number; seat: number; teamLabel?: string }[] {
   if (state.mode === 'team') {
-    // In team mode, teammates should tie for ranking based on total score
-    return state.players.map(p => {
-      const mySeat = state.turnOrder.indexOf(p.playerId);
-      const teamScore = p.score;
-      let greaterTeams = 0;
-      const allScores = new Set(state.players.map(x => x.score));
-      for (const s of allScores) {
-        if (s > teamScore) greaterTeams++;
-      }
-      return {
+    // Team mode: seats 0+2 = Team A, seats 1+3 = Team B
+    const teamAIndices = [0, 2];
+    const teamBIndices = [1, 3];
+    const teamAPlayers = teamAIndices.map(i => state.players[i]);
+    const teamBPlayers = teamBIndices.map(i => state.players[i]);
+    
+    const scoreA = teamAPlayers.reduce((s, p) => s + p.score, 0);
+    const scoreB = teamBPlayers.reduce((s, p) => s + p.score, 0);
+    
+    const rankA = scoreA >= scoreB ? 1 : 2;
+    const rankB = scoreB > scoreA ? 1 : 2;
+
+    const results: { playerId: string; totalScore: number; rank: number; seat: number; teamLabel: string }[] = [];
+    
+    for (const p of teamAPlayers) {
+      results.push({
         playerId: p.playerId,
-        totalScore: teamScore,
-        rank: greaterTeams + 1,
-        seat: mySeat,
-      };
-    });
+        totalScore: scoreA,
+        rank: rankA,
+        seat: state.turnOrder.indexOf(p.playerId),
+        teamLabel: 'A',
+      });
+    }
+    for (const p of teamBPlayers) {
+      results.push({
+        playerId: p.playerId,
+        totalScore: scoreB,
+        rank: rankB,
+        seat: state.turnOrder.indexOf(p.playerId),
+        teamLabel: 'B',
+      });
+    }
+
+    return results.sort((a, b) => a.rank - b.rank);
   } else {
     // Solo ranking
+    const sorted = [...state.players].sort((a, b) => b.score - a.score);
     return sorted.map((p, i) => ({
       playerId: p.playerId,
       totalScore: p.score,

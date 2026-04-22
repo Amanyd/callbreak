@@ -181,8 +181,8 @@ export function GameScreen({ gameState }: Props) {
   });
 
   const handCount = sortedHand.length;
-  // Wider angle spread — bottoms converge at pivot, tops fan out
-  const fanSpread = isMobile ? Math.min(handCount * 4, 52) : Math.min(handCount * 2.5, 30);
+  // Fan angle: tighter on mobile with larger cards
+  const fanSpread = isMobile ? Math.min(handCount * 2.5, 32) : Math.min(handCount * 2.5, 30);
   const startAngle = -fanSpread / 2;
 
   // Slide target position for trick-win animation

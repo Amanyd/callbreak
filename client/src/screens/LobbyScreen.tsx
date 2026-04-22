@@ -30,45 +30,47 @@ export function LobbyScreen({ playerName }: Props) {
 
   return (
     <div className="lobby animate-slide-up">
-      {/* Hero — Host a Battle */}
-      <div className="panel-hero panel-elevated lobby-hero" onClick={handleCreate}>
-        <div className="hero-content">
-          <span className="badge badge-primary" style={{ borderRadius: 'var(--radius-lg)', padding: '0.4rem 1.25rem' }}>INSTANT ACTION</span>
-          <h2 className="display-lg" style={{ marginTop: '0.5rem' }}>HOST A BATTLE</h2>
-          <p className="body-md" style={{ color: 'var(--on-surface-variant)', marginTop: '0.25rem' }}>
-            Set the rules, invite friends, and crush them.
-          </p>
+      <div className="lobby-fixed-top">
+        {/* Hero — Host a Battle */}
+        <div className="panel-hero panel-elevated lobby-hero" onClick={handleCreate}>
+          <div className="hero-content">
+            <span className="badge badge-primary" style={{ borderRadius: 'var(--radius-lg)', padding: '0.4rem 1.25rem' }}>INSTANT ACTION</span>
+            <h2 className="display-lg" style={{ marginTop: '0.5rem' }}>HOST A BATTLE</h2>
+            <p className="body-md" style={{ color: 'var(--on-surface-variant)', marginTop: '0.25rem' }}>
+              Set the rules, invite friends, and crush them.
+            </p>
+          </div>
+          <button className="hero-btn" onClick={(e) => { e.stopPropagation(); handleCreate(); }}>+</button>
         </div>
-        <button className="hero-btn" onClick={(e) => { e.stopPropagation(); handleCreate(); }}>+</button>
-      </div>
 
-      {/* Join by Code */}
-      <div style={{ display: 'flex', gap: '0.75rem' }}>
-        <input
-          type="text"
-          className="input"
-          placeholder="Enter Room Code (e.g. A8B2XY)"
-          value={joinCode}
-          onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-          onKeyDown={(e) => e.key === 'Enter' && handleJoin(joinCode)}
-          maxLength={6}
-          style={{ flex: 1, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: 'var(--radius-lg)' }}
-        />
-        <button className="btn btn-primary" onClick={() => handleJoin(joinCode)} disabled={joinCode.trim().length < 4}>
-          JOIN
-        </button>
-      </div>
+        {/* Join by Code */}
+        <div className="join-code-row">
+          <input
+            type="text"
+            className="input"
+            placeholder="Enter Room Code (e.g. A8B2XY)"
+            value={joinCode}
+            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => e.key === 'Enter' && handleJoin(joinCode)}
+            maxLength={6}
+            style={{ flex: 1, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: 'var(--radius-lg)' }}
+          />
+          <button className="btn btn-primary" onClick={() => handleJoin(joinCode)} disabled={joinCode.trim().length < 4}>
+            JOIN
+          </button>
+        </div>
 
-      {/* Battle Rooms List */}
-      <div>
         <div className="rooms-header">
           <h3 className="headline-lg">BATTLE ROOMS</h3>
           <button className="btn btn-small btn-outline" onClick={() => socket.emit('room:list')}>
             ↻ REFRESH
           </button>
         </div>
+      </div>
 
-        <div className="room-list" style={{ marginTop: '1rem' }}>
+      {/* Battle Rooms List — Scrollable container */}
+      <div className="rooms-container">
+        <div className="room-list">
           {rooms.length === 0 ? (
             <div className="no-rooms">
               <p className="headline-md" style={{ marginBottom: '0.5rem', color: '#ffffff' }}>NO ACTIVE ROOMS</p>

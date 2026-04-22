@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useSocket } from '../context/SocketContext';
-import { playCardThrow, playTrickWin } from '../sounds';
+import { playCardThrow, playTrickWin, playTrickSlide, playCardDeal, playBidPlace } from '../sounds';
 import type { ClientGameState, Card, Suit, TrickCard } from '@shared/types';
 
 interface Props {
@@ -28,7 +28,7 @@ function getAvatarIndex(seat: number): number {
   return seat % AVATAR_IMAGES.length;
 }
 
-function PlayingCard({ card, onClick, disabled, isInTrick, isTrump, style, className }: {
+const PlayingCard = memo(function PlayingCard({ card, onClick, disabled, isInTrick, isTrump, style, className }: {
   card: Card;
   onClick?: () => void;
   disabled?: boolean;
@@ -56,9 +56,9 @@ function PlayingCard({ card, onClick, disabled, isInTrick, isTrump, style, class
       {isTrump && <div className="trump-badge">👑</div>}
     </div>
   );
-}
+});
 
-function CardBack() {
+const CardBack = memo(function CardBack() {
   return (
     <div className="card-back-styled">
       <div className="card-back-inner">
@@ -68,7 +68,7 @@ function CardBack() {
       </div>
     </div>
   );
-}
+});
 
 export function GameScreen({ gameState }: Props) {
   const socket = useSocket();
@@ -86,7 +86,7 @@ export function GameScreen({ gameState }: Props) {
   const [slideTrick, setSlideTrick] = useState<TrickCard[] | null>(null);
   const [slideTarget, setSlideTarget] = useState<string | null>(null);
   const [thrownCardId, setThrownCardId] = useState<string | null>(null);
-  const prevTrickRef = useRef<number>(0);
+  const [roundScores, setRoundScores] = useState<any[] | null>(null);
 
   const positions = ['bottom', 'left', 'top', 'right'] as const;
 
@@ -109,6 +109,9 @@ export function GameScreen({ gameState }: Props) {
       setSlideTarget(winnerId);
       playTrickWin();
 
+      // Play slide sound slightly after the win chime
+      setTimeout(() => playTrickSlide(), 150);
+
       setTimeout(() => {
         setTrickWinner(null);
         setSlideTrick(null);
@@ -122,11 +125,18 @@ export function GameScreen({ gameState }: Props) {
       setTimeout(() => setThrownCardId(null), 400);
     };
 
+    const onRoundEnd = ({ scores }: { scores: any[] }) => {
+      setRoundScores(scores);
+      setTimeout(() => setRoundScores(null), 4000);
+    };
+
     socket.on('game:trickEnd', onTrickEnd);
     socket.on('game:cardPlayed', onCardPlayed);
+    socket.on('game:roundEnd', onRoundEnd);
     return () => {
       socket.off('game:trickEnd', onTrickEnd);
       socket.off('game:cardPlayed', onCardPlayed);
+      socket.off('game:roundEnd', onRoundEnd);
     };
   }, [socket]);
 
@@ -143,6 +153,7 @@ export function GameScreen({ gameState }: Props) {
 
   const handleBid = () => {
     if (selectedBid !== null) {
+      playBidPlace();
       socket.emit('game:bid', { bid: selectedBid });
       setSelectedBid(null);
     }
@@ -170,8 +181,8 @@ export function GameScreen({ gameState }: Props) {
   });
 
   const handCount = sortedHand.length;
-  // Make the cars arch more arched but fan tighter, bringing ends closer
-  const fanSpread = isMobile ? Math.min(handCount * 3.5, 45) : Math.min(handCount * 1.5, 20);
+  // Wider angle spread — bottoms converge at pivot, tops fan out
+  const fanSpread = isMobile ? Math.min(handCount * 4, 52) : Math.min(handCount * 2.5, 30);
   const startAngle = -fanSpread / 2;
 
   // Slide target position for trick-win animation
@@ -274,12 +285,7 @@ export function GameScreen({ gameState }: Props) {
             })}
           </div>
 
-          {/* TRUMP INDICATOR */}
-          {gameState.phase !== 'bidding' && gameState.trumpSuit && (
-            <div className="trump-indicator badge badge-secondary" style={{ position: 'absolute', top: '1rem', left: '1rem', zIndex: 10 }}>
-              TRUMP: <span className={SUIT_COLORS[gameState.trumpSuit]}>{SUIT_SYMBOLS[gameState.trumpSuit]}</span>
-            </div>
-          )}
+
 
           {/* Bid Overlay */}
           {gameState.phase === 'bidding' && isMyTurn && gameState.mode === 'solo' && (
@@ -371,21 +377,47 @@ export function GameScreen({ gameState }: Props) {
               </div>
             </div>
           )}
+
+          {/* Round End Summary */}
+          {roundScores && (
+            <div className="bid-overlay">
+              <div className="bid-panel" style={{ minWidth: '280px' }}>
+                <div className="bid-title headline-lg">ROUND COMPLETE</div>
+                <div style={{ marginTop: '0.75rem' }}>
+                  {roundScores.map((s: any) => (
+                    <div key={s.playerId} className="score-row" style={{ padding: '0.35rem 0', borderBottom: '1px solid var(--outline)' }}>
+                      <span style={{ fontWeight: s.playerId === myId ? 700 : 400 }}>
+                        {s.playerId === myId ? 'YOU' : s.name}
+                      </span>
+                      <span>
+                        {typeof s.bid === 'number' ? `${s.tricksWon}/${s.bid}` : 'Pass'}
+                        {' → '}
+                        <strong style={{ color: s.roundScore >= 0 ? 'var(--primary)' : '#ff4444' }}>
+                          {s.roundScore >= 0 ? '+' : ''}{s.roundScore}
+                        </strong>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="my-hand">
           {sortedHand.map((card, idx) => {
             const angle = startAngle + (idx * fanSpread / Math.max(handCount - 1, 1));
-            // Inverted Polynomial Parabola: Ends stay exactly at Y=0, Center gets hoisted purely UP by intensity amount
-            const normalizedPos = (idx / Math.max(handCount - 1, 1)) * 2 - 1; // ranges from -1 to 1
-            const dropIntensity = isMobile ? 80 : 50; 
-            const yOffset = - (1 - Math.pow(normalizedPos, 2)) * dropIntensity;
+            // Deep bowl arch: ends at Y=0, center lifted high
+            const normalizedPos = (idx / Math.max(handCount - 1, 1)) * 2 - 1; // -1 to 1
+            const dropIntensity = isMobile ? 130 : 100; 
+            const yOffset = -(1 - Math.pow(normalizedPos, 2)) * dropIntensity;
             
             return (
               <div
                 key={card.id}
                 className={gameState.trick === 1 && gameState.phase === 'bidding' ? 'deal-anim-wrapper' : ''}
-                style={{ animationDelay: `${idx * 0.05}s` }}
+                style={gameState.trick === 1 && gameState.phase === 'bidding' ? { animationDelay: `${idx * 0.07}s` } : undefined}
+                onAnimationStart={idx === 0 ? () => playCardDeal() : undefined}
               >
                 <PlayingCard
                   card={card}

@@ -118,7 +118,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
 }
 
@@ -147,7 +147,7 @@
   background: var(--surface-container);
   border: var(--stroke-width) solid var(--stroke-color);
   border-radius: var(--radius-xl);
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
 .room-card-icon {
@@ -205,8 +205,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal {
@@ -216,7 +221,7 @@
   padding: 2.5rem;
   max-width: 440px;
   width: 90%;
-  box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
   animation: popIn 0.3s ease-out;
 }
 
@@ -259,7 +264,7 @@
   border: var(--stroke-width) solid var(--stroke-color);
   border-radius: var(--radius-lg);
   padding: 0.75rem 2rem;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.15);
 }
 
 .player-slots {
@@ -334,7 +339,7 @@
 .mode-btn.active {
   background: var(--secondary);
   color: var(--on-secondary);
-  box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 }
 
 .waiting-actions {
@@ -354,6 +359,7 @@
   height: calc(100vh - 120px);
   max-width: 1400px;
   margin: 0 auto;
+  flex-shrink: 0; /* treat as single rigid block */
 }
 
 .game-table-wrapper {
@@ -370,7 +376,7 @@
   position: relative;
   min-height: 500px;
   overflow: visible;
-  box-shadow: 16px 16px 0 rgba(0,0,0,0.3);
+  box-shadow: 16px 16px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Halftone table background */
@@ -435,7 +441,7 @@
   border-radius: var(--radius-lg);
   border: 4px solid var(--stroke-color);
   overflow: hidden;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
 }
 
@@ -448,12 +454,12 @@
 
 .player-avatar-img.active-turn {
   border-color: var(--secondary-fixed);
-  box-shadow: 0 0 0 4px var(--secondary-fixed), 4px 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 4px var(--secondary-fixed), 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .player-avatar-img.trick-winner {
   border-color: var(--tertiary);
-  box-shadow: 0 0 0 4px var(--tertiary-container), 4px 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 4px var(--tertiary-container), 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .player-name-tag {
@@ -494,7 +500,7 @@
   border: 4px solid var(--stroke-color);
   background: var(--primary);
   margin-left: -24px;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
   transition: transform 0.2s;
@@ -512,7 +518,7 @@
 .card-back-inner {
   position: absolute;
   inset: 3px;
-  border: 1.5px solid rgba(255,255,255,0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 2px;
   display: flex;
   align-items: center;
@@ -520,7 +526,7 @@
 }
 
 .card-back-pattern {
-  color: rgba(255,255,255,0.3);
+  color: rgba(255, 255, 255, 0.3);
   font-size: 1rem;
   line-height: 1;
 }
@@ -552,8 +558,14 @@
 }
 
 @keyframes cardThrow {
-  0% { opacity: 0; transform: translate(0, 80px) scale(0.5) rotate(15deg); }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+    transform: translate(0, 80px) scale(0.5) rotate(15deg);
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 .trick-card-label {
@@ -591,9 +603,9 @@
   transition: transform 0.2s ease-out, box-shadow 0.2s, filter 0.2s;
   position: relative;
   user-select: none;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
-  margin-left: -50px;
+  margin-left: -60px;
 }
 
 .playing-card:first-child {
@@ -602,14 +614,14 @@
 
 .playing-card:hover:not(.disabled) {
   transform: translateY(-24px) scale(1.08) !important;
-  box-shadow: 8px 8px 0 rgba(0,0,0,0.3);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
   z-index: 10;
   filter: brightness(1.02);
 }
 
 .playing-card:active:not(.disabled) {
   transform: translateY(-12px) scale(1.02) !important;
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .playing-card.disabled {
@@ -620,7 +632,7 @@
 
 .playing-card.trump {
   border-color: var(--secondary-fixed);
-  box-shadow: 0 0 0 2px var(--secondary-fixed), 4px 4px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 0 0 2px var(--secondary-fixed), 4px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* Card corners */
@@ -702,20 +714,20 @@
   border-radius: var(--radius-xl);
   padding: 1.5rem 2.5rem;
   text-align: center;
-  box-shadow: 12px 12px 0 rgba(0,0,0,0.3);
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.3);
   animation: popIn 0.2s ease-out;
 }
 
 .bid-panel.waiting-bid {
   background: var(--surface-container);
   transform: rotate(0deg);
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.15);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.15);
 }
 
 .bid-title {
   -webkit-text-stroke: 1.5px var(--stroke-color);
   color: white;
-  text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .bid-options {
@@ -743,7 +755,7 @@
 .bid-btn.selected {
   background: var(--primary);
   color: var(--on-primary);
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
   transform: translateY(2px);
 }
 
@@ -760,7 +772,7 @@
   background: var(--secondary-container);
   border: 4px solid var(--stroke-color);
   border-radius: var(--radius-lg);
-  box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
   transform: rotate(2deg);
 }
 
@@ -843,7 +855,7 @@
   border-radius: var(--radius-xl);
   padding: 1.5rem 3rem;
   text-align: center;
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.2);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -871,7 +883,7 @@
   border-radius: var(--radius-lg);
   border: 5px solid var(--secondary-fixed);
   overflow: hidden;
-  box-shadow: 0 0 0 4px var(--secondary-fixed), 6px 6px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 0 0 4px var(--secondary-fixed), 6px 6px 0 rgba(0, 0, 0, 0.2);
 }
 
 .champion-avatar-img img {
@@ -886,7 +898,7 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 2rem;
-  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3));
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.3));
 }
 
 .champion-name {
@@ -927,7 +939,7 @@
   border: var(--stroke-width) solid var(--stroke-color);
   border-radius: var(--radius-xl);
   background: var(--surface-container);
-  box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .result-row.winner {
@@ -988,12 +1000,29 @@
 }
 
 @keyframes dealCardAnim {
-  0% { transform: translateY(200px) scale(0); opacity: 0; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+  0% {
+    transform: translate(0, -120px) rotate(-15deg) scale(0.4);
+    opacity: 0;
+    filter: blur(2px);
+  }
+
+  50% {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  80% {
+    transform: translate(0, 6px) rotate(1deg) scale(1.02);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
 }
 
 .deal-anim-wrapper {
-  animation: dealCardAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+  animation: dealCardAnim 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   display: inline-block;
 }
 
@@ -1005,7 +1034,21 @@
     overflow: hidden;
     position: relative;
   }
+
+  /* Default: non-game screens render normally, just centered */
   .main-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  /* Game screen: scale the whole table+scoreboard as one unit, centered */
+  .app.game-active .main-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1016,32 +1059,35 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+    padding: 0;
   }
 
-  .game-layout {
-    flex-direction: row;
-    width: 1500px; /* Tightly bundle the table + scoreboard into a single rigid box */
-    height: 680px; /* Reduced by 20% from 850px */
+  .app.game-active .game-layout {
+    /* Fixed size so the scale produces predictable output */
+    width: 1500px;
+    height: 680px;
+    max-width: none;
     margin: 0;
+    flex-shrink: 0;
   }
 
   .game-table-wrapper {
-    padding: 0; 
+    padding: 0;
     height: 100%;
   }
 
   .game-table {
     padding: 0.25rem;
-    height: 100%; 
+    height: 100%;
     min-height: 100%;
     width: 100%;
   }
 
   .scoreboard {
-    width: 310px; /* Increased 10% from 280px */
+    width: 310px;
     border-top: none;
     border-left: 4px solid var(--stroke-color);
     max-height: 100%;
   }
 }
-

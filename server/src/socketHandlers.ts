@@ -1,6 +1,7 @@
 import type { Server, Socket } from 'socket.io';
 import type { ServerToClientEvents, ClientToServerEvents } from '../../shared/types';
 import * as roomMgr from './roomManager';
+import { startGame, handleBid, handlePlayCard, reconnectPlayer } from './game/gameManager';
 
 type IO = Server<ClientToServerEvents, ServerToClientEvents>;
 type GameSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
@@ -78,10 +79,6 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
       if (room.players.length < 1) throw new Error('Need at least 1 player to start');
 
       roomMgr.setRoomState(room.code, 'playing');
-
-      // Game logic will be wired in Phase 3
-      // For now, just import and call startGame when it exists
-      const { startGame } = require('./game/gameManager');
       startGame(io, room);
 
       console.log(`🎮 Game started in room ${room.code}`);
@@ -90,11 +87,12 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
     }
   });
 
-  // ─── Game Events (wired in Phase 3) ────────────────────
+  // ─── Game Events ──────────────────────────────────────────
   socket.on('game:bid', ({ bid, suit }) => {
     try {
-      const { handleBid } = require('./game/gameManager');
-      handleBid(io, socket.id, bid, suit);
+      const room = roomMgr.getRoomByPlayer(socket.id);
+      if (!room) throw new Error('Not in a room');
+      handleBid(io, room, socket.id, bid, suit);
     } catch (err: any) {
       socket.emit('game:error', err.message);
     }
@@ -102,8 +100,9 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
 
   socket.on('game:playCard', ({ cardId }) => {
     try {
-      const { handlePlayCard } = require('./game/gameManager');
-      handlePlayCard(io, socket.id, cardId);
+      const room = roomMgr.getRoomByPlayer(socket.id);
+      if (!room) throw new Error('Not in a room');
+      handlePlayCard(io, room, socket.id, cardId);
     } catch (err: any) {
       socket.emit('game:error', err.message);
     }
@@ -121,6 +120,37 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
       io.to(room.code).emit('room:reset', resetRoom);
       io.emit('room:list', roomMgr.listRooms());
       console.log(`🔄 Room ${room.code} reset for play again`);
+    } catch (err: any) {
+      socket.emit('room:error', err.message);
+    }
+  });
+
+  // ─── Reconnection ──────────────────────────────────────────
+  socket.on('room:reconnect', ({ code, playerName }) => {
+    try {
+      const result = roomMgr.tryReconnect(code.toUpperCase(), playerName, socket.id);
+      if (!result) {
+        socket.emit('room:error', 'No active session found to reconnect');
+        return;
+      }
+
+      const { room, oldPlayerId } = result;
+      socket.join(room.code);
+
+      // If game is in progress, restore game state
+      if (room.state === 'playing') {
+        const reconnected = reconnectPlayer(io, room, oldPlayerId, socket.id);
+        if (reconnected) {
+          io.to(room.code).emit('room:updated', room);
+          console.log(`🔌 ${playerName} reconnected to room ${room.code}`);
+          return;
+        }
+      }
+
+      // Otherwise just rejoin the room
+      socket.emit('room:reconnected', { room });
+      io.to(room.code).emit('room:updated', room);
+      console.log(`🔌 ${playerName} reconnected to room ${room.code} (waiting)`);
     } catch (err: any) {
       socket.emit('room:error', err.message);
     }

@@ -212,7 +212,7 @@ export function scoreRound(state: GameState): { playerId: string; bid: number | 
   if (state.mode === 'solo') {
     // Solo scoring
     return state.players.map(p => {
-      const bid = (p.bid as number) || 1;
+      const bid = typeof p.bid === 'number' ? p.bid : 1;
       let roundScore: number;
       if (p.tricksWon >= bid) {
         roundScore = bid + (p.tricksWon - bid) * 0.1;
@@ -294,20 +294,14 @@ export function isGameOver(state: GameState): boolean {
 }
 
 /** Get final rankings */
-export function getFinalRankings(state: GameState): { playerId: string; totalScore: number; rank: number }[] {
+export function getFinalRankings(state: GameState): { playerId: string; totalScore: number; rank: number; seat: number }[] {
   const sorted = [...state.players].sort((a, b) => b.score - a.score);
   
   if (state.mode === 'team') {
     // In team mode, teammates should tie for ranking based on total score
     return state.players.map(p => {
-      // Find highest score of this player's team
       const mySeat = state.turnOrder.indexOf(p.playerId);
-      const partnerSeat = (mySeat + 2) % 4;
-      const partnerId = state.turnOrder[partnerSeat];
-      const partner = state.players.find(x => x.playerId === partnerId)!;
-      // Their scores are identical anyway due to how we scored
       const teamScore = p.score;
-      // Get rank by counting teams with strictly greater scores
       let greaterTeams = 0;
       const allScores = new Set(state.players.map(x => x.score));
       for (const s of allScores) {
@@ -317,6 +311,7 @@ export function getFinalRankings(state: GameState): { playerId: string; totalSco
         playerId: p.playerId,
         totalScore: teamScore,
         rank: greaterTeams + 1,
+        seat: mySeat,
       };
     });
   } else {
@@ -325,6 +320,7 @@ export function getFinalRankings(state: GameState): { playerId: string; totalSco
       playerId: p.playerId,
       totalScore: p.score,
       rank: i + 1,
+      seat: state.turnOrder.indexOf(p.playerId),
     }));
   }
 }

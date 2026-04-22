@@ -77,6 +77,7 @@ export interface ServerToClientEvents {
   'room:list': (rooms: Room[]) => void;
   'room:error': (msg: string) => void;
   'room:reset': (room: Room) => void;
+  'room:reconnected': (data: { room: Room; gameState?: ClientGameState }) => void;
 
   'game:start': (state: ClientGameState) => void;
   'game:stateUpdate': (state: ClientGameState) => void;
@@ -98,6 +99,7 @@ export interface ClientToServerEvents {
   'room:setTotalRounds': (data: { totalRounds: number }) => void;
   'room:start': () => void;
   'room:playAgain': () => void;
+  'room:reconnect': (data: { code: string; playerName: string }) => void;
 
   'game:bid': (data: { bid: number | 'pass'; suit?: Suit }) => void;
   'game:playCard': (data: { cardId: string }) => void;

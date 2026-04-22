@@ -9,7 +9,6 @@ interface Props {
 export function LobbyScreen({ playerName }: Props) {
   const socket = useSocket();
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [showJoinModal, setShowJoinModal] = useState(false);
   const [joinCode, setJoinCode] = useState('');
 
   useEffect(() => {
@@ -25,7 +24,6 @@ export function LobbyScreen({ playerName }: Props) {
   const handleJoin = (code: string) => {
     if (code.trim()) {
       socket.emit('room:join', { code: code.trim().toUpperCase(), playerName });
-      setShowJoinModal(false);
       setJoinCode('');
     }
   };

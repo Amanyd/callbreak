@@ -10,6 +10,7 @@ interface Ranking {
   name: string;
   totalScore: number;
   rank: number;
+  seat?: number;
 }
 
 interface Props {
@@ -22,9 +23,11 @@ export function ResultsScreen({ rankings, onPlayAgain, onBackToLobby }: Props) {
   if (!rankings || rankings.length === 0) return null;
 
   const champion = rankings[0];
-  // We don't have seat index here, so use ranking order as avatar index
-  const avatarMap = new Map<string, number>();
-  rankings.forEach((r, i) => avatarMap.set(r.playerId, i % AVATAR_IMAGES.length));
+
+  function getAvatar(r: Ranking): string {
+    const idx = typeof r.seat === 'number' ? r.seat : 0;
+    return AVATAR_IMAGES[idx % AVATAR_IMAGES.length];
+  }
 
   return (
     <div className="results-screen">
@@ -37,7 +40,7 @@ export function ResultsScreen({ rankings, onPlayAgain, onBackToLobby }: Props) {
       <div className="champion-display">
         <div className="champion-avatar-wrapper">
           <div className="champion-avatar-img">
-            <img src={AVATAR_IMAGES[avatarMap.get(champion.playerId) || 0]} alt={champion.name} />
+            <img src={getAvatar(champion)} alt={champion.name} />
           </div>
           <div className="champion-crown">👑</div>
         </div>
@@ -55,7 +58,7 @@ export function ResultsScreen({ rankings, onPlayAgain, onBackToLobby }: Props) {
           <div key={r.playerId} className={`result-row ${r.rank === 1 ? 'winner halftone' : ''}`}>
             <div className="result-rank">{r.rank}</div>
             <div className="result-avatar-img">
-              <img src={AVATAR_IMAGES[avatarMap.get(r.playerId) || 0]} alt={r.name} />
+              <img src={getAvatar(r)} alt={r.name} />
               {r.rank === 1 && <span className="result-crown">👑</span>}
             </div>
             <div className="result-name">{r.name}</div>

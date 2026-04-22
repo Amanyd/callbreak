@@ -1,12 +1,14 @@
 import type { Server } from 'socket.io';
 import type { ServerToClientEvents, ClientToServerEvents, Room, ClientGameState, GameState, Card, Suit } from '../../../shared/types';
-import { RANK_ORDER, TRUMP_SUIT } from '../../../shared/types';
+import { RANK_ORDER } from '../../../shared/types';
 import * as engine from './engine';
 
 type IO = Server<ClientToServerEvents, ServerToClientEvents>;
 
 // In-memory game state store
 const activeGames = new Map<string, GameState>();
+// Lock to prevent concurrent trick processing
+const processingLock = new Set<string>();
 const BOT_NAMES = ['Bot-Alpha', 'Bot-Bravo', 'Bot-Charlie'];
 
 function isBotId(id: string): boolean {
@@ -14,15 +16,13 @@ function isBotId(id: string): boolean {
 }
 
 // ─── Bot AI ──────────────────────────────────────────────────
-/** Pick the best legal card for a bot to play */
 function botChooseCard(state: GameState, botId: string): string {
   const player = state.players.find(p => p.playerId === botId);
   if (!player || player.hand.length === 0) throw new Error('Bot has no cards');
 
   const hand = player.hand;
-
-  // If leading the trick, play the highest non-trump card (or highest trump if only trumps)
   const trump = state.trumpSuit || 'spades';
+
   if (state.currentTrick.length === 0) {
     const nonTrump = hand.filter(c => c.suit !== trump);
     const pool = nonTrump.length > 0 ? nonTrump : hand;
@@ -34,24 +34,20 @@ function botChooseCard(state: GameState, botId: string): string {
   const cardsOfSuit = hand.filter(c => c.suit === leadSuit);
 
   if (cardsOfSuit.length > 0) {
-    // Must follow suit — play highest of that suit to try to win
     cardsOfSuit.sort((a, b) => RANK_ORDER[b.rank] - RANK_ORDER[a.rank]);
     return cardsOfSuit[0].id;
   }
 
-  // Can't follow suit — play lowest trump to win cheaply, or dump lowest card
   const trumps = hand.filter(c => c.suit === trump);
   if (trumps.length > 0) {
     trumps.sort((a, b) => RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
-    return trumps[0].id; // lowest trump
+    return trumps[0].id;
   }
 
-  // No lead suit, no trumps — dump lowest card
   const sorted = [...hand].sort((a, b) => RANK_ORDER[a.rank] - RANK_ORDER[b.rank]);
   return sorted[0].id;
 }
 
-/** Choose a reasonable bid for a bot */
 function botChooseBid(state: GameState, botId: string): { bid: number | 'pass', suit?: Suit } {
   const player = state.players.find(p => p.playerId === botId);
   if (!player) return { bid: state.mode === 'solo' ? 2 : 'pass' };
@@ -65,7 +61,6 @@ function botChooseBid(state: GameState, botId: string): { bid: number | 'pass', 
     }
     return { bid: Math.max(1, Math.min(13, Math.round(estimate))) };
   } else {
-    // Team mode bidding
     let bestSuit: Suit = 'spades';
     let bestEstimate = 0;
     const suits: Suit[] = ['spades', 'hearts', 'diamonds', 'clubs'];
@@ -73,9 +68,8 @@ function botChooseBid(state: GameState, botId: string): { bid: number | 'pass', 
     for (const s of suits) {
       let estimate = 0;
       for (const card of player.hand) {
-        if (card.suit === s) estimate += 0.8; // trumps are very strong
+        if (card.suit === s) estimate += 0.8;
         else if (RANK_ORDER[card.rank] >= 13) estimate += 0.5;
-        
         if (RANK_ORDER[card.rank] >= 12) estimate += 0.3;
         if (RANK_ORDER[card.rank] === 14) estimate += 0.3;
       }
@@ -86,8 +80,7 @@ function botChooseBid(state: GameState, botId: string): { bid: number | 'pass', 
     }
     
     const requiredBid = state.highestBid !== null ? state.highestBid + 1 : 6;
-    
-    if (requiredBid <= 13 && bestEstimate >= requiredBid - 1) { // Will bid if its estimate is reasonably close
+    if (requiredBid <= 13 && bestEstimate >= requiredBid - 1) {
       return { bid: requiredBid, suit: bestSuit };
     } else {
       return { bid: 'pass' };
@@ -96,7 +89,6 @@ function botChooseBid(state: GameState, botId: string): { bid: number | 'pass', 
 }
 
 // ─── Fill bots ───────────────────────────────────────────────
-/** Add bot players to room to fill up to 4 */
 function fillBotsInRoom(room: Room): void {
   const takenSeats = new Set(room.players.map(p => p.seat));
   let botIndex = 0;
@@ -117,77 +109,130 @@ function fillBotsInRoom(room: Room): void {
   }
 }
 
-// ─── Process bot turn ──────────────────────────────────────────
-/** If the current turn belongs to a bot, execute it automatically */
-function processBotTurn(io: IO, state: GameState, room: Room): void {
+// ─── Trick completion (shared between human + bot paths) ─────
+/**
+ * After the 4th card is played, broadcast state so client sees all 4 cards,
+ * then WAIT, then resolve the trick winner and continue.
+ */
+function scheduleTrickCompletion(io: IO, state: GameState, room: Room): void {
+  // Broadcast state WITH all 4 cards visible on the table
+  broadcastState(io, state, room);
+
+  // Snapshot the trick before we clear it
+  const completedTrick = [...state.currentTrick];
+
+  // After a short pause so the player can see all 4 cards, resolve the trick
+  setTimeout(() => {
+    try {
+      const winnerId = engine.completeTrick(state);
+
+      io.to(state.roomCode).emit('game:trickEnd', {
+        winnerId,
+        trick: completedTrick,
+      });
+
+      // After the slide animation completes, continue
+      setTimeout(() => {
+        try {
+          if (engine.isRoundOver(state)) {
+            handleRoundEnd(io, state, room);
+          } else {
+            broadcastState(io, state, room);
+            scheduleNextBotTurn(io, state, room);
+          }
+        } catch (err: any) {
+          console.error('Error after trick resolution:', err.message);
+          // Attempt recovery: broadcast current state
+          broadcastState(io, state, room);
+          scheduleNextBotTurn(io, state, room);
+        } finally {
+          processingLock.delete(state.roomCode);
+        }
+      }, 1200);
+    } catch (err: any) {
+      console.error('Error completing trick:', err.message);
+      processingLock.delete(state.roomCode);
+    }
+  }, 1200);
+}
+
+// ─── Bot turn scheduling ────────────────────────────────────────
+function scheduleNextBotTurn(io: IO, state: GameState, room: Room): void {
   const currentPlayerId = state.turnOrder[state.turnIndex];
   if (!isBotId(currentPlayerId)) return;
 
-  // Small delay to feel natural
   setTimeout(() => {
     try {
       if (state.phase === 'bidding') {
-        const { bid, suit } = botChooseBid(state, currentPlayerId);
-        engine.placeBid(state, currentPlayerId, bid, suit);
-        io.to(state.roomCode).emit('game:bidPlaced', { playerId: currentPlayerId, bid, suit });
-        broadcastState(io, state, room);
-        // Check if next player is also a bot
-        processBotTurn(io, state, room);
+        executeBotBid(io, state, room);
       } else if (state.phase === 'playing') {
-        const cardId = botChooseCard(state, currentPlayerId);
-        const card = engine.playCard(state, currentPlayerId, cardId);
-        io.to(state.roomCode).emit('game:cardPlayed', { playerId: currentPlayerId, card });
-
-        if (engine.isTrickComplete(state)) {
-          const completedTrick = [...state.currentTrick];
-          const winnerId = engine.completeTrick(state);
-
-          setTimeout(() => {
-            io.to(state.roomCode).emit('game:trickEnd', {
-              winnerId,
-              trick: completedTrick,
-            });
-
-            if (engine.isRoundOver(state)) {
-              const scores = engine.scoreRound(state);
-              const scoresWithNames = scores.map(s => {
-                const rp = room.players.find(p => p.id === s.playerId);
-                return { ...s, name: rp?.name || 'Unknown' };
-              });
-              io.to(state.roomCode).emit('game:roundEnd', { scores: scoresWithNames });
-
-              if (state.round >= state.totalRounds) {
-                state.phase = 'gameEnd';
-                const rankings = engine.getFinalRankings(state);
-                const rankingsWithNames = rankings.map(r => {
-                  const rp = room.players.find(p => p.id === r.playerId);
-                  return { ...r, name: rp?.name || 'Unknown' };
-                });
-                io.to(state.roomCode).emit('game:gameEnd', { rankings: rankingsWithNames });
-                activeGames.delete(state.roomCode);
-              } else {
-                engine.startNextRound(state);
-                broadcastState(io, state, room);
-                processBotTurn(io, state, room);
-              }
-            } else {
-              broadcastState(io, state, room);
-              processBotTurn(io, state, room);
-            }
-          }, 1000);
-        } else {
-          broadcastState(io, state, room);
-          processBotTurn(io, state, room);
-        }
+        executeBotPlay(io, state, room);
       }
     } catch (err: any) {
       console.error(`Bot ${currentPlayerId} error:`, err.message);
+      // Recovery: try to advance to next player to prevent freeze
+      state.turnIndex = (state.turnIndex + 1) % 4;
+      broadcastState(io, state, room);
+      scheduleNextBotTurn(io, state, room);
     }
-  }, 600); // 600ms delay per bot action
+  }, 500);
 }
 
-// ─── Client state builders ─────────────────────────────────────
-function buildClientState(state: GameState, forPlayerId: string): ClientGameState {
+function executeBotBid(io: IO, state: GameState, room: Room): void {
+  const currentPlayerId = state.turnOrder[state.turnIndex];
+  const { bid, suit } = botChooseBid(state, currentPlayerId);
+  engine.placeBid(state, currentPlayerId, bid, suit);
+  io.to(state.roomCode).emit('game:bidPlaced', { playerId: currentPlayerId, bid, suit });
+  broadcastState(io, state, room);
+  scheduleNextBotTurn(io, state, room);
+}
+
+function executeBotPlay(io: IO, state: GameState, room: Room): void {
+  if (processingLock.has(state.roomCode)) return; // don't play if trick is resolving
+
+  const currentPlayerId = state.turnOrder[state.turnIndex];
+  const cardId = botChooseCard(state, currentPlayerId);
+  const card = engine.playCard(state, currentPlayerId, cardId);
+  io.to(state.roomCode).emit('game:cardPlayed', { playerId: currentPlayerId, card });
+
+  if (engine.isTrickComplete(state)) {
+    processingLock.add(state.roomCode);
+    scheduleTrickCompletion(io, state, room);
+  } else {
+    broadcastState(io, state, room);
+    scheduleNextBotTurn(io, state, room);
+  }
+}
+
+function handleRoundEnd(io: IO, state: GameState, room: Room): void {
+  const scores = engine.scoreRound(state);
+  const scoresWithNames = scores.map(s => {
+    const rp = room.players.find(p => p.id === s.playerId);
+    return { ...s, name: rp?.name || 'Unknown' };
+  });
+  io.to(state.roomCode).emit('game:roundEnd', { scores: scoresWithNames });
+
+  if (state.round >= state.totalRounds) {
+    state.phase = 'gameEnd';
+    const rankings = engine.getFinalRankings(state);
+    const rankingsWithNames = rankings.map(r => {
+      const rp = room.players.find(p => p.id === r.playerId);
+      return { ...r, name: rp?.name || 'Unknown' };
+    });
+    io.to(state.roomCode).emit('game:gameEnd', { rankings: rankingsWithNames });
+    activeGames.delete(state.roomCode);
+  } else {
+    // Delay before starting next round so roundEnd overlay is visible
+    setTimeout(() => {
+      engine.startNextRound(state);
+      broadcastState(io, state, room);
+      scheduleNextBotTurn(io, state, room);
+    }, 3000);
+  }
+}
+
+// ─── Client state builder ─────────────────────────────────────
+function buildClientState(state: GameState, forPlayerId: string, room: Room): ClientGameState {
   const me = state.players.find(p => p.playerId === forPlayerId);
   return {
     roomCode: state.roomCode,
@@ -204,32 +249,26 @@ function buildClientState(state: GameState, forPlayerId: string): ClientGameStat
     highestBidder: state.highestBidder,
     consecutivePasses: state.consecutivePasses,
     myHand: me?.hand || [],
-    players: state.players.map(p => ({
-      id: p.playerId,
-      name: '',
-      seat: state.turnOrder.indexOf(p.playerId),
-      bid: p.bid,
-      tricksWon: p.tricksWon,
-      score: p.score,
-      cardCount: p.hand.length,
-      connected: true,
-    })),
+    players: state.players.map(p => {
+      const roomPlayer = room.players.find(rp => rp.id === p.playerId);
+      return {
+        id: p.playerId,
+        name: roomPlayer?.name || 'Unknown',
+        seat: state.turnOrder.indexOf(p.playerId),
+        bid: p.bid,
+        tricksWon: p.tricksWon,
+        score: p.score,
+        cardCount: p.hand.length,
+        connected: roomPlayer?.connected ?? true,
+      };
+    }),
   };
-}
-
-function buildClientStateWithNames(state: GameState, forPlayerId: string, room: Room): ClientGameState {
-  const clientState = buildClientState(state, forPlayerId);
-  clientState.players = clientState.players.map(p => {
-    const roomPlayer = room.players.find(rp => rp.id === p.id);
-    return { ...p, name: roomPlayer?.name || 'Unknown', connected: roomPlayer?.connected ?? true };
-  });
-  return clientState;
 }
 
 function broadcastState(io: IO, state: GameState, room: Room): void {
   for (const player of state.players) {
     if (!isBotId(player.playerId)) {
-      const clientState = buildClientStateWithNames(state, player.playerId, room);
+      const clientState = buildClientState(state, player.playerId, room);
       io.to(player.playerId).emit('game:stateUpdate', clientState);
     }
   }
@@ -241,99 +280,75 @@ function broadcastState(io: IO, state: GameState, room: Room): void {
 
 // ─── Public API ─────────────────────────────────────────────────
 export function startGame(io: IO, room: Room): void {
-  // Fill bots if fewer than 4 human players
   fillBotsInRoom(room);
 
   const playerIds = room.players.map(p => p.id);
   const state = engine.initGameState(room.code, playerIds, room.mode, room.totalRounds);
   activeGames.set(room.code, state);
 
-  // Send initial state to human players only
   for (const player of state.players) {
     if (!isBotId(player.playerId)) {
-      const clientState = buildClientStateWithNames(state, player.playerId, room);
+      const clientState = buildClientState(state, player.playerId, room);
       io.to(player.playerId).emit('game:start', clientState);
     }
   }
 
-  // Notify first bidder (or trigger bot)
   const firstBidderId = state.turnOrder[state.turnIndex];
   if (isBotId(firstBidderId)) {
-    processBotTurn(io, state, room);
+    scheduleNextBotTurn(io, state, room);
   } else {
     io.to(firstBidderId).emit('game:yourTurn');
   }
 }
 
-export function handleBid(io: IO, playerId: string, bid: number | 'pass', suit?: Suit): void {
+export function handleBid(io: IO, room: Room, playerId: string, bid: number | 'pass', suit?: Suit): void {
   const state = findGameByPlayer(playerId);
   if (!state) throw new Error('Not in an active game');
-
-  const room = getRoomForGame(state);
 
   engine.placeBid(state, playerId, bid, suit);
   io.to(state.roomCode).emit('game:bidPlaced', { playerId, bid, suit });
-
   broadcastState(io, state, room);
-
-  // If next turn is a bot, process it
-  processBotTurn(io, state, room);
+  scheduleNextBotTurn(io, state, room);
 }
 
-export function handlePlayCard(io: IO, playerId: string, cardId: string): void {
+export function handlePlayCard(io: IO, room: Room, playerId: string, cardId: string): void {
   const state = findGameByPlayer(playerId);
   if (!state) throw new Error('Not in an active game');
+  if (processingLock.has(state.roomCode)) throw new Error('Trick is being resolved');
 
-  const room = getRoomForGame(state);
   const card = engine.playCard(state, playerId, cardId);
-
   io.to(state.roomCode).emit('game:cardPlayed', { playerId, card });
 
   if (engine.isTrickComplete(state)) {
-    const completedTrick = [...state.currentTrick];
-    const winnerId = engine.completeTrick(state);
-
-    setTimeout(() => {
-      io.to(state.roomCode).emit('game:trickEnd', {
-        winnerId,
-        trick: completedTrick,
-      });
-
-      if (engine.isRoundOver(state)) {
-        const scores = engine.scoreRound(state);
-        const scoresWithNames = scores.map(s => {
-          const rp = room.players.find(p => p.id === s.playerId);
-          return { ...s, name: rp?.name || 'Unknown' };
-        });
-
-        io.to(state.roomCode).emit('game:roundEnd', { scores: scoresWithNames });
-
-        if (state.round >= state.totalRounds) {
-          state.phase = 'gameEnd';
-          const rankings = engine.getFinalRankings(state);
-          const rankingsWithNames = rankings.map(r => {
-            const rp = room.players.find(p => p.id === r.playerId);
-            return { ...r, name: rp?.name || 'Unknown' };
-          });
-          io.to(state.roomCode).emit('game:gameEnd', { rankings: rankingsWithNames });
-          activeGames.delete(state.roomCode);
-        } else {
-          engine.startNextRound(state);
-          broadcastState(io, state, room);
-          processBotTurn(io, state, room);
-        }
-      } else {
-        broadcastState(io, state, room);
-        processBotTurn(io, state, room);
-      }
-    }, 1500);
+    processingLock.add(state.roomCode);
+    scheduleTrickCompletion(io, state, room);
   } else {
     broadcastState(io, state, room);
-    processBotTurn(io, state, room);
+    scheduleNextBotTurn(io, state, room);
   }
 }
 
-// Helper to find game state by player
+export function reconnectPlayer(io: IO, room: Room, oldPlayerId: string, newPlayerId: string): boolean {
+  const state = findGameByPlayer(oldPlayerId);
+  if (!state) return false;
+
+  const player = state.players.find(p => p.playerId === oldPlayerId);
+  if (!player) return false;
+
+  player.playerId = newPlayerId;
+  const orderIdx = state.turnOrder.indexOf(oldPlayerId);
+  if (orderIdx !== -1) state.turnOrder[orderIdx] = newPlayerId;
+
+  const clientState = buildClientState(state, newPlayerId, room);
+  io.to(newPlayerId).emit('game:start', clientState);
+
+  if (state.turnOrder[state.turnIndex] === newPlayerId) {
+    io.to(newPlayerId).emit('game:yourTurn');
+  }
+
+  return true;
+}
+
 function findGameByPlayer(playerId: string): GameState | undefined {
   for (const state of activeGames.values()) {
     if (state.players.some(p => p.playerId === playerId)) {
@@ -341,12 +356,4 @@ function findGameByPlayer(playerId: string): GameState | undefined {
     }
   }
   return undefined;
-}
-
-// Get room data for a game
-function getRoomForGame(state: GameState): Room {
-  const { getRoom } = require('../roomManager');
-  const room = getRoom(state.roomCode);
-  if (!room) throw new Error('Room not found');
-  return room;
 }

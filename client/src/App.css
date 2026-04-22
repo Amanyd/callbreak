@@ -1000,14 +1000,16 @@
 /* ─── Mobile Responsiveness (Landscape Default) ────────────────────────────────── */
 @media (max-width: 1000px) {
   .app {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
+    position: relative;
   }
   .main-content {
-    flex: 0 0 auto;
-    transform: scale(0.45);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.45);
     transform-origin: center center;
     width: 222.22vw;
     height: 222.22vh;
@@ -1015,19 +1017,23 @@
 
   .game-layout {
     flex-direction: row;
+    height: 100%;
+    align-items: center;
   }
 
   .game-table-wrapper {
-    padding: 2% 10%; /* decrease width by squeezing the horizontal padding */
+    padding: 0 15%; /* aggressively squish table width inward */
+    height: 100%;
   }
 
   .game-table {
     padding: 0.25rem;
-    min-height: 90%; /* Increase table height */
+    min-height: 95%; /* stretch height as much as possible */
+    width: 100%;
   }
 
   .scoreboard {
-    width: 280px;
+    width: 260px; /* shrink score panel slightly to give table more breathing room */
     border-top: none;
     border-left: 4px solid var(--stroke-color);
     max-height: 100%;

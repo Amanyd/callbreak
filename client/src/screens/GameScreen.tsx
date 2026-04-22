@@ -373,11 +373,14 @@ export function GameScreen({ gameState }: Props) {
           )}
         </div>
 
-        {/* My Hand */}
         <div className="my-hand">
           {sortedHand.map((card, idx) => {
             const angle = startAngle + (idx * fanSpread / Math.max(handCount - 1, 1));
-            const yOffset = Math.abs(angle) * 0.6;
+            // Polynomial parabola to force deep arch: ends drop heavy down, center pushed up
+            const normalizedPos = (idx / Math.max(handCount - 1, 1)) * 2 - 1; // ranges from -1 to 1
+            const dropIntensity = isMobile ? 80 : 50; 
+            const yOffset = (Math.pow(normalizedPos, 2) * dropIntensity) - (dropIntensity / 3);
+            
             return (
               <div
                 key={card.id}

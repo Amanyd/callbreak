@@ -1021,7 +1021,7 @@
   .game-layout {
     flex-direction: row;
     width: 1500px; /* Tightly bundle the table + scoreboard into a single rigid box */
-    height: 850px; /* Decrease height so it doesn't touch the bottom screen edges */
+    height: 680px; /* Reduced by 20% from 850px */
     margin: 0;
   }
 
@@ -1038,7 +1038,7 @@
   }
 
   .scoreboard {
-    width: 280px; 
+    width: 310px; /* Increased 10% from 280px */
     border-top: none;
     border-left: 4px solid var(--stroke-color);
     max-height: 100%;

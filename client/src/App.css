@@ -1185,7 +1185,7 @@
   }
 
   .scoreboard {
-    width: 260px;
+    width: 340px;
     border-top: none;
     border-left: 4px solid var(--stroke-color);
     max-height: 100%;
@@ -1193,9 +1193,9 @@
 
   /* Larger playing cards on mobile */
   .playing-card {
-    width: 110px;
-    height: 154px;
-    margin-left: -72px;
+    width: 130px;
+    height: 182px;
+    margin-left: -90px;
   }
 
   .playing-card:first-child {
@@ -1203,7 +1203,7 @@
   }
 
   .my-hand {
-    min-height: 170px;
+    min-height: 200px;
     padding: 1rem 0.5rem 0.5rem;
   }
 }

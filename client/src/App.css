@@ -1035,19 +1035,25 @@
     position: relative;
   }
 
-  /* Default: non-game screens render normally, just centered */
+  /* Non-game screens: scale content to fit the viewport */
   .main-content {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow-y: auto;
-    padding: 1rem;
-    box-sizing: border-box;
+    overflow: hidden;
   }
 
-  /* Game screen: scale the whole table+scoreboard as one unit, centered */
+  /* Scale non-game screens down to fit 100vw × 100vh */
+  .main-content > * {
+    transform-origin: center center;
+    transform: scale(min(1, min(calc(100vw / 480px), calc(100vh / 700px))));
+    max-width: 480px;
+    width: 100%;
+  }
+
+  /* Game screen: override — scale the whole table+scoreboard as one rigid unit */
   .app.game-active .main-content {
     position: absolute;
     top: 50%;
@@ -1063,9 +1069,16 @@
     padding: 0;
   }
 
+  /* Reset child scale inside game screen (game content is handled by parent) */
+  .app.game-active .main-content > * {
+    transform: none;
+    max-width: none;
+    width: auto;
+  }
+
   .app.game-active .game-layout {
-    /* Fixed size so the scale produces predictable output */
-    width: 1500px;
+    /* Narrower width to prevent left/right clipping */
+    width: 1180px;
     height: 680px;
     max-width: none;
     margin: 0;
@@ -1085,7 +1098,7 @@
   }
 
   .scoreboard {
-    width: 310px;
+    width: 260px;
     border-top: none;
     border-left: 4px solid var(--stroke-color);
     max-height: 100%;

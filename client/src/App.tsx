@@ -10,32 +10,21 @@ import './App.css';
 
 type Screen = 'lobby' | 'waiting' | 'game' | 'results';
 
-// Session persistence helpers
-const SESSION_KEY = 'callbreak_session';
-function saveSession(code: string, name: string) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ code, name }));
-}
+// Session helpers — no longer used for reconnect, just kept for potential future use
 function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-function loadSession(): { code: string; name: string } | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (data.code && data.name) return data;
-  } catch {}
-  return null;
+  localStorage.removeItem('callbreak_session');
 }
 
 function App() {
-  const savedSession = loadSession();
+  // Always clear any leftover session on fresh load
+  clearSession();
+
   const [screen, setScreen] = useState<Screen>('lobby');
   const [room, setRoom] = useState<Room | null>(null);
   const [gameState, setGameState] = useState<ClientGameState | null>(null);
   const [finalRankings, setFinalRankings] = useState<any[] | null>(null);
-  const [playerName, setPlayerName] = useState(savedSession?.name || '');
-  const [nameSet, setNameSet] = useState(!!savedSession?.name);
+  const [playerName, setPlayerName] = useState('');
+  const [nameSet, setNameSet] = useState(false);
 
   useEffect(() => {
     if (window.screen && window.screen.orientation && 'lock' in window.screen.orientation) {
@@ -55,11 +44,13 @@ function App() {
       const targetScreen = e.state?.screen as Screen | undefined;
 
       if (targetScreen === 'lobby' || !targetScreen) {
-        // Going back to lobby — leave room
+        // Going back — leave room and reset to name entry
         socket.emit('room:leave');
         setRoom(null);
         setGameState(null);
         setFinalRankings(null);
+        setPlayerName('');
+        setNameSet(false);
         setScreen('lobby');
       } else if (targetScreen === 'waiting') {
         setScreen('waiting');
@@ -82,24 +73,18 @@ function App() {
   useEffect(() => {
     socket.on('room:created', (r) => {
       setRoom(r);
-      saveSession(r.code, playerName);
       navigateTo('waiting');
     });
 
     socket.on('room:joined', (r) => {
       setRoom(r);
-      saveSession(r.code, playerName);
       navigateTo('waiting');
     });
 
-    socket.on('room:reconnected', ({ room: r, gameState: gs }) => {
+    socket.on('room:reconnected', ({ room: r }) => {
+      // Reconnection disabled — just show lobby
       setRoom(r);
-      if (gs) {
-        setGameState(gs);
-        navigateTo('game');
-      } else {
-        navigateTo('waiting');
-      }
+      navigateTo('waiting');
     });
 
     socket.on('room:updated', (r) => {
@@ -108,7 +93,6 @@ function App() {
 
     socket.on('game:start', (state) => {
       setGameState(state);
-      saveSession(state.roomCode, playerName);
       navigateTo('game');
     });
 
@@ -118,7 +102,6 @@ function App() {
 
     socket.on('game:gameEnd', ({ rankings }) => {
       setFinalRankings(rankings);
-      clearSession();
       navigateTo('results');
     });
 
@@ -151,26 +134,6 @@ function App() {
     };
   }, [navigateTo, playerName]);
 
-  // Auto-reconnect on socket connect/reconnect
-  useEffect(() => {
-    const attemptReconnect = () => {
-      const session = loadSession();
-      if (session) {
-        console.log(`🔌 Attempting reconnect to room ${session.code}...`);
-        socket.emit('room:reconnect', { code: session.code, playerName: session.name });
-      }
-    };
-
-    // Only attempt on reconnection (not initial connect if we're already set up)
-    socket.on('connect', attemptReconnect);
-    
-    // Also attempt right now if socket is already connected and we have a saved session
-    if (socket.connected && loadSession() && screen === 'lobby') {
-      attemptReconnect();
-    }
-
-    return () => { socket.off('connect', attemptReconnect); };
-  }, [screen]);
 
   const handleSetName = (name: string) => {
     setPlayerName(name);

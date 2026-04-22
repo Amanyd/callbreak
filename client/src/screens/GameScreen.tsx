@@ -407,9 +407,9 @@ export function GameScreen({ gameState }: Props) {
         <div className="my-hand">
           {sortedHand.map((card, idx) => {
             const angle = startAngle + (idx * fanSpread / Math.max(handCount - 1, 1));
-            // Deep bowl arch: ends at Y=0, center lifted high
+            // Gentle bowl arch: ends at Y=0, center lifted slightly
             const normalizedPos = (idx / Math.max(handCount - 1, 1)) * 2 - 1; // -1 to 1
-            const dropIntensity = isMobile ? 130 : 100; 
+            const dropIntensity = isMobile ? 60 : 40; 
             const yOffset = -(1 - Math.pow(normalizedPos, 2)) * dropIntensity;
             
             return (

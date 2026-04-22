@@ -1142,7 +1142,7 @@
   .app.game-active .main-content {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 46%;
     transform: translate(-50%, -50%) scale(0.42);
     transform-origin: center center;
     width: 238vw;

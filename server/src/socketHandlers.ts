@@ -1,12 +1,24 @@
 import type { Server, Socket } from 'socket.io';
 import type { ServerToClientEvents, ClientToServerEvents } from '../../shared/types';
 import * as roomMgr from './roomManager';
-import { startGame, handleBid, handlePlayCard, reconnectPlayer } from './game/gameManager';
+import { startGame, handleBid, handlePlayCard } from './game/gameManager';
 
 type IO = Server<ClientToServerEvents, ServerToClientEvents>;
 type GameSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
 export function registerSocketHandlers(io: IO, socket: GameSocket): void {
+  // Auto-join the lobby room on connection for scoped broadcasts
+  socket.join('lobby');
+
+  // ─── Lobby Scoping ──────────────────────────────────────────
+  socket.on('lobby:join', () => {
+    socket.join('lobby');
+  });
+
+  socket.on('lobby:leave', () => {
+    socket.leave('lobby');
+  });
+
   // ─── Room Events ─────────────────────────────────────────
 
   socket.on('room:create', ({ playerName }) => {
@@ -14,7 +26,7 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
       const room = roomMgr.createRoom(socket.id, playerName);
       socket.join(room.code);
       socket.emit('room:created', room);
-      io.emit('room:list', roomMgr.listRooms());
+      io.to('lobby').emit('room:list', roomMgr.listRooms());
       console.log(`📦 Room ${room.code} created by ${playerName}`);
     } catch (err: any) {
       socket.emit('room:error', err.message);
@@ -27,7 +39,7 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
       socket.join(room.code);
       socket.emit('room:joined', room);
       io.to(room.code).emit('room:updated', room);
-      io.emit('room:list', roomMgr.listRooms());
+      io.to('lobby').emit('room:list', roomMgr.listRooms());
       console.log(`🚪 ${playerName} joined room ${room.code}`);
     } catch (err: any) {
       socket.emit('room:error', err.message);
@@ -41,7 +53,7 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
       io.to(room.code).emit('room:updated', room);
     }
     if (!destroyed) {
-      io.emit('room:list', roomMgr.listRooms());
+      io.to('lobby').emit('room:list', roomMgr.listRooms());
     }
   });
 
@@ -79,6 +91,13 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
       if (room.players.length < 1) throw new Error('Need at least 1 player to start');
 
       roomMgr.setRoomState(room.code, 'playing');
+
+      // Remove all players from lobby room to stop receiving room:list
+      for (const p of room.players) {
+        const playerSocket = io.sockets.sockets.get(p.id);
+        if (playerSocket) playerSocket.leave('lobby');
+      }
+
       startGame(io, room);
 
       console.log(`🎮 Game started in room ${room.code}`);
@@ -118,39 +137,8 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
 
       // Broadcast to all players in the room
       io.to(room.code).emit('room:reset', resetRoom);
-      io.emit('room:list', roomMgr.listRooms());
+      io.to('lobby').emit('room:list', roomMgr.listRooms());
       console.log(`🔄 Room ${room.code} reset for play again`);
-    } catch (err: any) {
-      socket.emit('room:error', err.message);
-    }
-  });
-
-  // ─── Reconnection ──────────────────────────────────────────
-  socket.on('room:reconnect', ({ code, playerName }) => {
-    try {
-      const result = roomMgr.tryReconnect(code.toUpperCase(), playerName, socket.id);
-      if (!result) {
-        socket.emit('room:error', 'No active session found to reconnect');
-        return;
-      }
-
-      const { room, oldPlayerId } = result;
-      socket.join(room.code);
-
-      // If game is in progress, restore game state
-      if (room.state === 'playing') {
-        const reconnected = reconnectPlayer(io, room, oldPlayerId, socket.id);
-        if (reconnected) {
-          io.to(room.code).emit('room:updated', room);
-          console.log(`🔌 ${playerName} reconnected to room ${room.code}`);
-          return;
-        }
-      }
-
-      // Otherwise just rejoin the room
-      socket.emit('room:reconnected', { room });
-      io.to(room.code).emit('room:updated', room);
-      console.log(`🔌 ${playerName} reconnected to room ${room.code} (waiting)`);
     } catch (err: any) {
       socket.emit('room:error', err.message);
     }
@@ -159,11 +147,10 @@ export function registerSocketHandlers(io: IO, socket: GameSocket): void {
   // ─── Disconnect ──────────────────────────────────────────
   socket.on('disconnect', () => {
     console.log(`💔 Player disconnected: ${socket.id}`);
-    const { room, destroyed } = roomMgr.markDisconnected(socket.id);
+    const { room } = roomMgr.markDisconnected(socket.id);
     if (room) {
       io.to(room.code).emit('room:updated', room);
     }
-    // Always refresh room list so stale rooms disappear
-    io.emit('room:list', roomMgr.listRooms());
+    io.to('lobby').emit('room:list', roomMgr.listRooms());
   });
 }

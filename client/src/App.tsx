@@ -10,15 +10,7 @@ import './App.css';
 
 type Screen = 'lobby' | 'waiting' | 'game' | 'results';
 
-// Session helpers — no longer used for reconnect, just kept for potential future use
-function clearSession() {
-  localStorage.removeItem('callbreak_session');
-}
-
 function App() {
-  // Always clear any leftover session on fresh load
-  clearSession();
-
   const [screen, setScreen] = useState<Screen>('lobby');
   const [room, setRoom] = useState<Room | null>(null);
   const [gameState, setGameState] = useState<ClientGameState | null>(null);
@@ -73,17 +65,13 @@ function App() {
   useEffect(() => {
     socket.on('room:created', (r) => {
       setRoom(r);
+      socket.emit('lobby:leave');
       navigateTo('waiting');
     });
 
     socket.on('room:joined', (r) => {
       setRoom(r);
-      navigateTo('waiting');
-    });
-
-    socket.on('room:reconnected', ({ room: r }) => {
-      // Reconnection disabled — just show lobby
-      setRoom(r);
+      socket.emit('lobby:leave');
       navigateTo('waiting');
     });
 
@@ -123,7 +111,6 @@ function App() {
     return () => {
       socket.off('room:created');
       socket.off('room:joined');
-      socket.off('room:reconnected');
       socket.off('room:updated');
       socket.off('game:start');
       socket.off('game:stateUpdate');
@@ -132,7 +119,7 @@ function App() {
       socket.off('room:error');
       socket.off('game:error');
     };
-  }, [navigateTo, playerName]);
+  }, [navigateTo]);
 
 
   const handleSetName = (name: string) => {
@@ -144,7 +131,7 @@ function App() {
 
   const handleBackToLobby = () => {
     socket.emit('room:leave');
-    clearSession();
+    socket.emit('lobby:join');
     setRoom(null);
     setGameState(null);
     setFinalRankings(null);

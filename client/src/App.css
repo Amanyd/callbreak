@@ -48,11 +48,23 @@
 }
 
 /* ─── Main Content ─────────────────────────────────────────── */
+.app {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
 .main-content {
+  width: 100%;
+  height: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  min-height: calc(100vh - 60px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ─── Name Entry ───────────────────────────────────────────── */
@@ -60,7 +72,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 120px);
+  width: 100%;
+  height: 100%;
 }
 
 .name-card {
@@ -93,6 +106,7 @@
   display: flex;
   flex-direction: row;
   gap: 2rem;
+  width: 100%;
   height: 100%;
   max-height: 100%;
   overflow: hidden;
@@ -162,7 +176,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* Critical for flex child scroll */
+  min-height: 0;
+  /* Critical for flex child scroll */
 }
 
 .room-list {
@@ -291,10 +306,12 @@
 .waiting-room {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   gap: 2rem;
   max-width: 800px;
+  width: 100%;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .waiting-left {
@@ -418,21 +435,34 @@
 /* ═══════════════════════════════════════════════════════════
    Game Screen — Kinetic Panel Style
    ═══════════════════════════════════════════════════════════ */
+
+/* During game: let everything overflow so nothing is clipped */
+.app.game-active {
+  overflow: visible;
+}
+
+.app.game-active .main-content {
+  max-width: none;
+  overflow: visible;
+  padding: 3.5rem 1rem 1rem;
+  align-items: flex-start;
+}
+
 .game-layout {
   display: flex;
   gap: 1rem;
-  height: calc(100vh - 120px);
-  max-width: 1400px;
+  width: 1250px;
+  height: calc(100vh - 240px);
   margin: 0 auto;
-  flex-shrink: 0; /* treat as single rigid block */
+  flex-shrink: 0;
+  overflow: visible;
 }
 
 .game-table-wrapper {
-  flex: 1;
+  width: 1030px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  min-width: 0;
 }
 
 .game-table {
@@ -441,8 +471,8 @@
   border: 6px solid var(--stroke-color);
   border-radius: var(--radius-xl);
   position: relative;
-  min-height: 500px;
-  height: 500px; /* Fixed height so table doesn't shrink */
+  min-height: 200px;
+  height: 200px;
   overflow: visible;
   box-shadow: 16px 16px 0 rgba(0, 0, 0, 0.3);
 }
@@ -645,20 +675,34 @@
   display: none;
 }
 
-/* Player hand — fanned out at bottom */
+/* Player hand — fixed at bottom of screen, independent of table */
 .my-hand {
+  position: fixed;
+  bottom: -2px;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
-  padding: 1.5rem 1rem 0.5rem;
+  padding: 0.5rem 2rem 0;
   gap: 0;
   perspective: 1200px;
-  min-height: 140px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.my-hand>* {
+  pointer-events: auto;
+  margin-left: -15px;
+}
+
+.my-hand>*:first-child {
+  margin-left: 0;
 }
 
 /* ─── Playing Cards ────────────────────────────────────────── */
 .playing-card {
-  width: 88px;
-  height: 124px;
+  width: 140px;
+  height: 196px;
   background: var(--surface-container-lowest);
   background-image: linear-gradient(135deg, var(--surface-container-lowest) 0%, var(--surface-container) 100%);
   border: 4px solid var(--stroke-color);
@@ -673,7 +717,7 @@
   user-select: none;
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
-  margin-left: -60px;
+  isolation: isolate;
 }
 
 .playing-card:first-child {
@@ -693,9 +737,36 @@
 }
 
 .playing-card.disabled {
-  opacity: 0.85;
+  opacity: 1;
   cursor: not-allowed;
-  filter: grayscale(0.3);
+  filter: brightness(0.9);
+}
+
+/* Face card anime illustration */
+.card-face-img {
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  right: 4px;
+  bottom: 8px;
+  width: calc(100% - 8px);
+  height: calc(100% - 16px);
+  object-fit: cover;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Suit overlay on face cards */
+.card-face-suit {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  z-index: 2;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 2px rgba(255, 255, 255, 1);
+  pointer-events: none;
 }
 
 .playing-card.trump {
@@ -710,6 +781,8 @@
   flex-direction: column;
   align-items: center;
   line-height: 1;
+  z-index: 2;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
 }
 
 .card-corner.top-left {
@@ -726,16 +799,58 @@
 .card-corner-rank {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 1.1rem;
 }
 
 .card-corner-suit {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
 }
 
-/* Centre suit symbol */
+/* Centre suit symbol (for face cards) */
 .card-center-suit {
-  font-size: 2.2rem;
+  font-size: 2rem;
+  line-height: 1;
+  z-index: 2;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 2px rgba(255, 255, 255, 1);
+}
+
+/* ─── Pip Layout (Number Cards) ────────────────────────── */
+.card-pips {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+}
+
+.pip-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  flex: 0 0 auto;
+  min-width: 20px;
+}
+
+.pip-col-center {
+  justify-content: space-around;
+}
+
+.pip {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.pip.flip {
+  transform: rotate(180deg);
+}
+
+.pip.ace {
+  font-size: 5.5rem;
   line-height: 1;
 }
 
@@ -841,7 +956,6 @@
   border: 4px solid var(--stroke-color);
   border-radius: var(--radius-lg);
   box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
-  transform: rotate(2deg);
 }
 
 .scoreboard-title {
@@ -910,10 +1024,12 @@
 .results-screen {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   gap: 2rem;
   max-width: 800px;
+  width: 100%;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .results-left {
@@ -960,8 +1076,8 @@
 }
 
 .champion-avatar-img {
-  width: 100px;
-  height: 100px;
+  width: 72px;
+  height: 72px;
   border-radius: var(--radius-lg);
   border: 5px solid var(--secondary-fixed);
   overflow: hidden;
@@ -1128,14 +1244,19 @@
   }
 
   /* Scale non-game screens down to fit 100vw × 100vh */
-  .main-content > * {
+  .main-content>* {
     transform-origin: center center;
-    transform: scale(min(1, min(calc(100vw / 800px), calc(100vh / 500px))));
+    transform: scale(min(1, min(calc(100vw / 1100px), calc(100vh / 750px))));
     max-width: 800px;
     width: 100%;
   }
 
-  /* Game screen: the app itself must allow overflow for the scaled content */
+  .results-screen {
+    transform: scale(0.75);
+    transform-origin: center center;
+  }
+
+  /* Game screen: allow overflow so nothing is clipped */
   .app.game-active {
     overflow: visible;
   }
@@ -1143,7 +1264,7 @@
   /* Game screen: override — scale the whole table+scoreboard as one rigid unit */
   .app.game-active .main-content {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.42);
     transform-origin: center center;
@@ -1157,22 +1278,22 @@
   }
 
   /* Reset child scale inside game screen (game content is handled by parent) */
-  .app.game-active .main-content > * {
+  .app.game-active .main-content>* {
     transform: none;
     max-width: none;
     width: auto;
   }
 
   .app.game-active .game-layout {
-    /* Narrower width to prevent left/right clipping */
-    width: 1180px;
-    height: 680px;
+    width: 1400px;
+    height: 560px;
     max-width: none;
     margin: 0;
     flex-shrink: 0;
   }
 
-  .game-table-wrapper {
+  .app.game-active .game-table-wrapper {
+    width: 1080px;
     padding: 0;
     height: 100%;
   }
@@ -1187,23 +1308,30 @@
   .scoreboard {
     width: 340px;
     border-top: none;
-    border-left: 4px solid var(--stroke-color);
     max-height: 100%;
   }
 
   /* Larger playing cards on mobile */
   .playing-card {
-    width: 130px;
-    height: 182px;
-    margin-left: -90px;
+    width: 180px;
+    height: 252px;
   }
 
-  .playing-card:first-child {
+  .my-hand>* {
+    margin-left: -30px;
+  }
+
+  .my-hand>*:first-child {
     margin-left: 0;
   }
 
   .my-hand {
-    min-height: 200px;
-    padding: 1rem 0.5rem 0.5rem;
+    position: absolute;
+    bottom: -14vh;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: auto;
+    padding: 0 1rem;
   }
 }

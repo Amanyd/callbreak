@@ -63,6 +63,9 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 body {
@@ -71,12 +74,13 @@ body {
   background-image: radial-gradient(circle, #9f004d 2px, transparent 2.5px);
   background-size: 10px 10px;
   color: var(--on-surface);
-  overflow-x: hidden;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 #root {
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* ─── Typography ───────────────────────────────────────────── */

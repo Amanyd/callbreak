@@ -57,7 +57,7 @@ export function ResultsScreen({ rankings, onPlayAgain, onBackToLobby }: Props) {
             <div className="champion-avatar-img">
               <img src={getAvatar(champion)} alt={champion.name} />
             </div>
-            <div className="champion-crown">👑</div>
+
           </div>
           <div className="champion-name headline-md">{champion.name}</div>
           <div className="total-score-badge">

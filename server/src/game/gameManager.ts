@@ -1,5 +1,5 @@
 import type { Server } from 'socket.io';
-import type { ServerToClientEvents, ClientToServerEvents, Room, ClientGameState, GameState, Card, Suit } from '../../../shared/types';
+import type { ServerToClientEvents, ClientToServerEvents, Room, ClientGameState, GameState, Suit } from '../../../shared/types';
 import { RANK_ORDER } from '../../../shared/types';
 import * as engine from './engine';
 
@@ -7,12 +7,31 @@ type IO = Server<ClientToServerEvents, ServerToClientEvents>;
 
 // In-memory game state store
 const activeGames = new Map<string, GameState>();
+// Reverse index: playerId → roomCode for O(1) lookups
+const playerGameMap = new Map<string, string>();
 // Lock to prevent concurrent trick processing
 const processingLock = new Set<string>();
+// Track active timers per room for cleanup
+const activeTimers = new Map<string, Set<ReturnType<typeof setTimeout>>>();
 const BOT_NAMES = ['Bot-Alpha', 'Bot-Bravo', 'Bot-Charlie'];
 
 function isBotId(id: string): boolean {
   return id.startsWith('bot-');
+}
+
+/** Schedule a timer that is automatically tracked for cleanup */
+function scheduleTimer(roomCode: string, callback: () => void, delay: number): void {
+  if (!activeTimers.has(roomCode)) {
+    activeTimers.set(roomCode, new Set());
+  }
+  const timers = activeTimers.get(roomCode)!;
+  const handle = setTimeout(() => {
+    timers.delete(handle);
+    // Guard: only execute if game still exists
+    if (!activeGames.has(roomCode)) return;
+    callback();
+  }, delay);
+  timers.add(handle);
 }
 
 // ─── Bot AI ──────────────────────────────────────────────────
@@ -122,7 +141,7 @@ function scheduleTrickCompletion(io: IO, state: GameState, room: Room): void {
   const completedTrick = [...state.currentTrick];
 
   // After a short pause so the player can see all 4 cards, resolve the trick
-  setTimeout(() => {
+  scheduleTimer(state.roomCode, () => {
     try {
       const winnerId = engine.completeTrick(state);
 
@@ -132,7 +151,7 @@ function scheduleTrickCompletion(io: IO, state: GameState, room: Room): void {
       });
 
       // After the slide animation completes, continue
-      setTimeout(() => {
+      scheduleTimer(state.roomCode, () => {
         try {
           if (engine.isRoundOver(state)) {
             handleRoundEnd(io, state, room);
@@ -161,7 +180,7 @@ function scheduleNextBotTurn(io: IO, state: GameState, room: Room): void {
   const currentPlayerId = state.turnOrder[state.turnIndex];
   if (!isBotId(currentPlayerId)) return;
 
-  setTimeout(() => {
+  scheduleTimer(state.roomCode, () => {
     try {
       if (state.phase === 'bidding') {
         executeBotBid(io, state, room);
@@ -220,10 +239,10 @@ function handleRoundEnd(io: IO, state: GameState, room: Room): void {
       return { ...r, name: rp?.name || 'Unknown' };
     });
     io.to(state.roomCode).emit('game:gameEnd', { rankings: rankingsWithNames });
-    activeGames.delete(state.roomCode);
+    cleanupGame(state.roomCode);
   } else {
     // Delay before starting next round so roundEnd overlay is visible
-    setTimeout(() => {
+    scheduleTimer(state.roomCode, () => {
       engine.startNextRound(state);
       broadcastState(io, state, room);
       scheduleNextBotTurn(io, state, room);
@@ -286,6 +305,11 @@ export function startGame(io: IO, room: Room): void {
   const state = engine.initGameState(room.code, playerIds, room.mode, room.totalRounds);
   activeGames.set(room.code, state);
 
+  // Register all players in reverse index for O(1) lookup
+  for (const pid of playerIds) {
+    playerGameMap.set(pid, room.code);
+  }
+
   for (const player of state.players) {
     if (!isBotId(player.playerId)) {
       const clientState = buildClientState(state, player.playerId, room);
@@ -328,32 +352,29 @@ export function handlePlayCard(io: IO, room: Room, playerId: string, cardId: str
   }
 }
 
-export function reconnectPlayer(io: IO, room: Room, oldPlayerId: string, newPlayerId: string): boolean {
-  const state = findGameByPlayer(oldPlayerId);
-  if (!state) return false;
-
-  const player = state.players.find(p => p.playerId === oldPlayerId);
-  if (!player) return false;
-
-  player.playerId = newPlayerId;
-  const orderIdx = state.turnOrder.indexOf(oldPlayerId);
-  if (orderIdx !== -1) state.turnOrder[orderIdx] = newPlayerId;
-
-  const clientState = buildClientState(state, newPlayerId, room);
-  io.to(newPlayerId).emit('game:start', clientState);
-
-  if (state.turnOrder[state.turnIndex] === newPlayerId) {
-    io.to(newPlayerId).emit('game:yourTurn');
-  }
-
-  return true;
-}
 
 function findGameByPlayer(playerId: string): GameState | undefined {
-  for (const state of activeGames.values()) {
-    if (state.players.some(p => p.playerId === playerId)) {
-      return state;
+  const roomCode = playerGameMap.get(playerId);
+  if (!roomCode) return undefined;
+  return activeGames.get(roomCode);
+}
+
+/** Clean up all resources for a game (called on game end or room destroy) */
+export function cleanupGame(roomCode: string): void {
+  const state = activeGames.get(roomCode);
+  if (state) {
+    // Remove reverse-index entries for all players
+    for (const p of state.players) {
+      playerGameMap.delete(p.playerId);
     }
   }
-  return undefined;
+  activeGames.delete(roomCode);
+  processingLock.delete(roomCode);
+
+  // Cancel all pending timers
+  const timers = activeTimers.get(roomCode);
+  if (timers) {
+    for (const t of timers) clearTimeout(t);
+    activeTimers.delete(roomCode);
+  }
 }

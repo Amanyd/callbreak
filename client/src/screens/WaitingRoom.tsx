@@ -59,8 +59,8 @@ export function WaitingRoom({ room, onBack }: Props) {
                 <>
                   <div className="slot-avatar empty-avatar">?</div>
                   <div>
-                    <div className="title-md" style={{ color: '#ffffffaa' }}>Waiting...</div>
-                    <div className="label-md" style={{ color: '#ffffffaa' }}>SEAT {i + 1}</div>
+                    <div className="title-md" style={{ color: '#000000' }}>Waiting...</div>
+                    <div className="label-md" style={{ color: '#000000' }}>SEAT {i + 1}</div>
                   </div>
                 </>
               )}
@@ -109,13 +109,19 @@ export function WaitingRoom({ room, onBack }: Props) {
           </div>
         )}
         {!isHost && (
-          <div style={{ textAlign: 'center', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-            <div className="badge badge-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
-              MODE: {room.mode === 'solo' ? '⚔️ SOLO' : '🤝 TEAM'}
+          <div style={{ textAlign: 'center' }}>
+            <span className="label-lg" style={{ display: 'block', marginBottom: '0.5rem', color: '#ffffff' }}>GAME MODE</span>
+            <div className="mode-selector" style={{ justifyContent: 'center' }}>
+              <button className={`mode-btn ${room.mode === 'solo' ? 'active' : ''}`} disabled>
+                Solo
+              </button>
+              <button className={`mode-btn ${room.mode === 'team' ? 'active' : ''}`} disabled>
+                Team
+              </button>
             </div>
-            <div className="badge badge-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }}>
-              ROUNDS: {room.totalRounds}
-            </div>
+            <p className="body-md" style={{ marginTop: '1rem', color: '#ffffffcc' }}>
+              Waiting for host to start the match
+            </p>
           </div>
         )}
 

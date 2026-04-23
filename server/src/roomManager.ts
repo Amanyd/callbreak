@@ -1,20 +1,21 @@
 import type { Room, Player, RoomMode } from '../../shared/types';
+import { cleanupGame } from './game/gameManager';
 
 // In-memory room store
 const rooms = new Map<string, Room>();
 // Map socket.id → room code for fast disconnect lookup
 const playerRoomMap = new Map<string, string>();
-// Map "roomCode:playerName" → old socket ID for reconnection
-const disconnectedPlayers = new Map<string, string>();
 
 function generateCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I/O/0/1 to avoid confusion
   let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  // Ensure uniqueness
-  if (rooms.has(code)) return generateCode();
+  // Use a loop instead of recursion to avoid stack overflow risk
+  do {
+    code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+  } while (rooms.has(code));
   return code;
 }
 
@@ -76,6 +77,7 @@ export function leaveRoom(playerId: string): { room: Room | null; destroyed: boo
   playerRoomMap.delete(playerId);
 
   if (room.players.length === 0) {
+    cleanupGame(code);
     rooms.delete(code);
     return { room: null, destroyed: true };
   }
@@ -106,21 +108,14 @@ export function markDisconnected(playerId: string): { room: Room | null; destroy
   const player = room.players.find(p => p.id === playerId);
   if (player) {
     player.connected = false;
-    // Store for reconnection lookup
-    const key = `${code}:${player.name}`;
-    disconnectedPlayers.set(key, playerId);
   }
 
   // If ALL human players (non-bot) are disconnected, destroy the room
   const humanPlayers = room.players.filter(p => !p.id.startsWith('bot-'));
   const allDisconnected = humanPlayers.every(p => !p.connected);
   if (allDisconnected) {
-    // Clean up all player mappings
-    room.players.forEach(p => {
-      playerRoomMap.delete(p.id);
-      const k = `${code}:${p.name}`;
-      disconnectedPlayers.delete(k);
-    });
+    room.players.forEach(p => playerRoomMap.delete(p.id));
+    cleanupGame(code);
     rooms.delete(code);
     return { room: null, destroyed: true };
   }
@@ -146,10 +141,6 @@ export function setTotalRounds(code: string, playerId: string, totalRounds: numb
   if (totalRounds % 2 !== 0 || totalRounds < 2) throw new Error('Total rounds must be an even number');
   room.totalRounds = totalRounds;
   return room;
-}
-
-export function getRoom(code: string): Room | undefined {
-  return rooms.get(code);
 }
 
 export function getRoomByPlayer(playerId: string): Room | undefined {
@@ -184,39 +175,4 @@ export function resetRoom(code: string): Room | null {
   room.state = 'waiting';
 
   return room;
-}
-
-/** Try to reconnect a player by room code + name. Returns old socket ID if found. */
-export function tryReconnect(code: string, playerName: string, newSocketId: string): { room: Room; oldPlayerId: string } | null {
-  const key = `${code}:${playerName}`;
-  const oldId = disconnectedPlayers.get(key);
-  if (!oldId) return null;
-
-  const room = rooms.get(code);
-  if (!room) {
-    disconnectedPlayers.delete(key);
-    return null;
-  }
-
-  const player = room.players.find(p => p.id === oldId);
-  if (!player) {
-    disconnectedPlayers.delete(key);
-    return null;
-  }
-
-  // Swap IDs
-  player.id = newSocketId;
-  player.connected = true;
-
-  // Update host if needed
-  if (room.host === oldId) {
-    room.host = newSocketId;
-  }
-
-  // Update maps
-  playerRoomMap.delete(oldId);
-  playerRoomMap.set(newSocketId, code);
-  disconnectedPlayers.delete(key);
-
-  return { room, oldPlayerId: oldId };
 }

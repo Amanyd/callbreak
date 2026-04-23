@@ -185,3 +185,45 @@ export function startBackgroundMusic() {
     bgMusic = null;
   });
 }
+
+/** Modern minimal button click — short crisp "tick" */
+export function playButtonClick() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const t = ctx.currentTime;
+
+  // Short high-pitched tick via oscillator
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1800, t);
+  osc.frequency.exponentialRampToValueAtTime(1200, t + 0.03);
+  gain.gain.setValueAtTime(0.15, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+  osc.start(t);
+  osc.stop(t + 0.06);
+
+  // Tiny noise layer for texture
+  playNoiseBurst(0.02, 4000, 10000, 0.06, t);
+}
+
+/** Trigger haptic feedback on supported devices */
+export function triggerHaptic(durationMs: number = 10) {
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    navigator.vibrate(durationMs);
+  }
+}
+
+/** Attach global click sound + haptic to all <button> elements (call once at app init) */
+export function initButtonSounds() {
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button')) {
+      playButtonClick();
+      triggerHaptic(10);
+    }
+  }, { passive: true });
+}

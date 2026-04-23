@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { createPortal } from 'react-dom';
 import { useSocket } from '../context/SocketContext';
 import { playCardThrow, playTrickWin, playTrickSlide, playCardDeal, playBidPlace } from '../sounds';
 import type { ClientGameState, Card, Suit, TrickCard } from '@shared/types';
@@ -569,26 +570,29 @@ export function GameScreen({ gameState }: Props) {
         </div>
       </div>
 
-      {/* Player Hand — fixed at bottom, independent of table */}
-      <div className="my-hand">
-        {sortedHand.map((card, idx) => {
-          return (
-            <div
-              key={card.id}
-              className={gameState.trick === 1 && gameState.phase === 'bidding' ? 'deal-anim-wrapper' : ''}
-              style={gameState.trick === 1 && gameState.phase === 'bidding' ? { animationDelay: `${idx * 0.07}s` } : undefined}
-              onAnimationStart={idx === 0 ? () => playCardDeal() : undefined}
-            >
-              <PlayingCard
-                card={card}
-                onClick={() => handlePlayCard(card.id)}
-                disabled={!canPlayCard(card)}
-                isTrump={card.suit === (gameState.trumpSuit || 'spades')}
-              />
-            </div>
-          );
-        })}
-      </div>
+      {/* Player Hand — portaled to body so position:fixed works outside scaled container */}
+      {createPortal(
+        <div className="my-hand">
+          {sortedHand.map((card, idx) => {
+            return (
+              <div
+                key={card.id}
+                className={gameState.trick === 1 && gameState.phase === 'bidding' ? 'deal-anim-wrapper' : ''}
+                style={gameState.trick === 1 && gameState.phase === 'bidding' ? { animationDelay: `${idx * 0.07}s` } : undefined}
+                onAnimationStart={idx === 0 ? () => playCardDeal() : undefined}
+              >
+                <PlayingCard
+                  card={card}
+                  onClick={() => handlePlayCard(card.id)}
+                  disabled={!canPlayCard(card)}
+                  isTrump={card.suit === (gameState.trumpSuit || 'spades')}
+                />
+              </div>
+            );
+          })}
+        </div>,
+        document.body
+      )}
     </>
   );
 }

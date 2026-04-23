@@ -4,7 +4,7 @@ import { LobbyScreen } from './screens/LobbyScreen';
 import { WaitingRoom } from './screens/WaitingRoom';
 import { GameScreen } from './screens/GameScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
-import { startBackgroundMusic } from './sounds';
+import { startBackgroundMusic, initButtonSounds } from './sounds';
 import type { Room, ClientGameState } from '@shared/types';
 import './App.css';
 
@@ -22,6 +22,28 @@ function App() {
     if (window.screen && window.screen.orientation && 'lock' in window.screen.orientation) {
       (window.screen.orientation as any).lock('landscape').catch((e: any) => console.log('Orientation lock unavailable:', e));
     }
+    initButtonSounds();
+  }, []);
+
+  // Dynamically compute scale factors for mobile layouts
+  useEffect(() => {
+    const updateScales = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      // Game layout is 1400×560. Leave ~30% of vh for cards at bottom.
+      const gameScaleX = vw / 1400;
+      const gameScaleY = (vh * 0.70) / 560;
+      const gameScale = Math.min(gameScaleX, gameScaleY);
+      // Non-game screens: fit 800px wide content into viewport
+      const uiScaleX = vw / 900;
+      const uiScaleY = vh / 600;
+      const uiScale = Math.min(1, Math.min(uiScaleX, uiScaleY));
+      document.documentElement.style.setProperty('--game-scale', String(gameScale.toFixed(4)));
+      document.documentElement.style.setProperty('--ui-scale', String(uiScale.toFixed(4)));
+    };
+    updateScales();
+    window.addEventListener('resize', updateScales);
+    return () => window.removeEventListener('resize', updateScales);
   }, []);
 
   // Navigate to a screen and push browser history

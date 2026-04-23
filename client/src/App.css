@@ -1228,12 +1228,20 @@
 @media (max-width: 1000px) {
   .app {
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
+    height: 100vh; /* fallback */
     overflow: hidden;
     position: relative;
+    /* Safe areas for notched devices */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 
-  /* Non-game screens: scale content to fit the viewport */
+  @supports (height: 100dvh) {
+    .app { height: 100dvh; }
+  }
+
+  /* Non-game screens: scale content to fit viewport (var set by JS) */
   .main-content {
     position: absolute;
     inset: 0;
@@ -1243,16 +1251,15 @@
     overflow: hidden;
   }
 
-  /* Scale non-game screens down to fit 100vw × 100vh */
   .main-content>* {
     transform-origin: center center;
-    transform: scale(min(1, min(calc(100vw / 1100px), calc(100vh / 750px))));
+    transform: scale(var(--ui-scale, 0.55));
     max-width: 800px;
     width: 100%;
   }
 
   .results-screen {
-    transform: scale(0.75);
+    transform: scale(calc(var(--ui-scale, 0.55) * 0.85));
     transform-origin: center center;
   }
 
@@ -1261,12 +1268,12 @@
     overflow: visible;
   }
 
-  /* Game screen: override — scale the whole table+scoreboard as one rigid unit */
+  /* Game screen: scale using JS-computed --game-scale */
   .app.game-active .main-content {
     position: absolute;
-    top: 45%;
+    top: 40%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.42);
+    transform: translate(-50%, -50%) scale(var(--game-scale, 0.42));
     transform-origin: center center;
     width: 238vw;
     height: 238vh;
@@ -1277,7 +1284,7 @@
     padding: 0;
   }
 
-  /* Reset child scale inside game screen (game content is handled by parent) */
+  /* Reset child scale inside game screen */
   .app.game-active .main-content>* {
     transform: none;
     max-width: none;
@@ -1313,25 +1320,15 @@
 
   /* Larger playing cards on mobile */
   .playing-card {
-    width: 180px;
-    height: 252px;
+    width: 150px;
+    height: 210px;
   }
 
   .my-hand>* {
-    margin-left: -30px;
+    margin-left: -20px;
   }
 
   .my-hand>*:first-child {
     margin-left: 0;
-  }
-
-  .my-hand {
-    position: absolute;
-    bottom: -14vh;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    width: auto;
-    padding: 0 1rem;
   }
 }

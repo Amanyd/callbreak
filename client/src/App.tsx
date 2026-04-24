@@ -25,25 +25,33 @@ function App() {
     initButtonSounds();
   }, []);
 
-  // Dynamically compute scale factors for mobile layouts
+  // Lock layout dimensions at first load — prevents nav-bar resize causing readjustment
   useEffect(() => {
-    const updateScales = () => {
+    // Use screen dimensions (stable) instead of window dimensions (change with nav bar)
+    const lockedW = window.screen.availWidth || window.innerWidth;
+    const lockedH = window.screen.availHeight || window.innerHeight;
+
+    // Game layout is 1400×560. Leave ~30% of vh for cards at bottom.
+    // Game scale still uses live window size for accuracy during gameplay
+    const updateGameScale = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      // Game layout is 1400×560. Leave ~30% of vh for cards at bottom.
       const gameScaleX = vw / 1400;
       const gameScaleY = (vh * 0.70) / 560;
       const gameScale = Math.min(gameScaleX, gameScaleY);
-      // Non-game screens: fit content into viewport with minimal margins
-      const uiScaleX = (vw - 16) / vw;   // nearly full width
-      const uiScaleY = (vh - 16) / vh;    // nearly full height
-      const uiScale = Math.min(1, Math.min(uiScaleX, uiScaleY));
       document.documentElement.style.setProperty('--game-scale', String(gameScale.toFixed(4)));
-      document.documentElement.style.setProperty('--ui-scale', String(uiScale.toFixed(4)));
     };
-    updateScales();
-    window.addEventListener('resize', updateScales);
-    return () => window.removeEventListener('resize', updateScales);
+
+    // Non-game UI scale: locked, never changes
+    const uiScale = 1;
+    document.documentElement.style.setProperty('--ui-scale', String(uiScale));
+    // Store locked dimensions as CSS vars for the fixed container
+    document.documentElement.style.setProperty('--locked-w', `${lockedW}px`);
+    document.documentElement.style.setProperty('--locked-h', `${lockedH}px`);
+
+    updateGameScale();
+    window.addEventListener('resize', updateGameScale);
+    return () => window.removeEventListener('resize', updateGameScale);
   }, []);
 
   // Navigate to a screen and push browser history

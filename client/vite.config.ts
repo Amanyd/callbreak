@@ -13,7 +13,8 @@ export default defineConfig({
         name: 'BAD!!',
         short_name: 'BAD!!',
         description: 'Multiplayer Callbreak Card Game',
-        theme_color: '#1a1b1f',
+        theme_color: '#b50058',
+        background_color: '#b50058',
         display: 'fullscreen',
         orientation: 'landscape',
         icons: [

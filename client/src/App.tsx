@@ -34,9 +34,9 @@ function App() {
       const gameScaleX = vw / 1400;
       const gameScaleY = (vh * 0.70) / 560;
       const gameScale = Math.min(gameScaleX, gameScaleY);
-      // Non-game screens: fit 800px wide content into viewport
-      const uiScaleX = vw / 900;
-      const uiScaleY = vh / 600;
+      // Non-game screens: fit content into viewport with minimal margins
+      const uiScaleX = (vw - 16) / vw;   // nearly full width
+      const uiScaleY = (vh - 16) / vh;    // nearly full height
       const uiScale = Math.min(1, Math.min(uiScaleX, uiScaleY));
       document.documentElement.style.setProperty('--game-scale', String(gameScale.toFixed(4)));
       document.documentElement.style.setProperty('--ui-scale', String(uiScale.toFixed(4)));

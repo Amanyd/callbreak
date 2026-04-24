@@ -186,28 +186,36 @@ export function startBackgroundMusic() {
   });
 }
 
-/** Modern minimal button click — short crisp "tick" */
+/** Modern minimal button click — ultra-short crisp "tick" */
 export function playButtonClick() {
   const ctx = getAudioContext();
   if (!ctx) return;
 
   const t = ctx.currentTime;
 
-  // Short high-pitched tick via oscillator
+  // Ultra-short high-frequency "tick" — like a modern UI tap
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.connect(gain);
   gain.connect(ctx.destination);
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(1800, t);
-  osc.frequency.exponentialRampToValueAtTime(1200, t + 0.03);
-  gain.gain.setValueAtTime(0.15, t);
-  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+  osc.frequency.value = 4800;
+  gain.gain.setValueAtTime(0.08, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.008);
   osc.start(t);
-  osc.stop(t + 0.06);
+  osc.stop(t + 0.01);
 
-  // Tiny noise layer for texture
-  playNoiseBurst(0.02, 4000, 10000, 0.06, t);
+  // Subtle low "pop" for weight
+  const pop = ctx.createOscillator();
+  const popGain = ctx.createGain();
+  pop.connect(popGain);
+  popGain.connect(ctx.destination);
+  pop.type = 'sine';
+  pop.frequency.value = 600;
+  popGain.gain.setValueAtTime(0.04, t);
+  popGain.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
+  pop.start(t);
+  pop.stop(t + 0.02);
 }
 
 /** Trigger haptic feedback on supported devices */

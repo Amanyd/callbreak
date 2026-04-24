@@ -285,7 +285,15 @@ export function GameScreen({ gameState }: Props) {
     });
   }, [bgGifs]);
 
-  const currentBg = bgGifs[Math.max(0, gameState.round - 1) % bgGifs.length];
+  const [bgIndex, setBgIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex(prev => (prev + 1) % bgGifs.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [bgGifs]);
+
+  const currentBg = bgGifs[bgIndex];
 
   return (
     <>
@@ -385,7 +393,7 @@ export function GameScreen({ gameState }: Props) {
                 <div className="bid-panel">
                   <div className="bid-title headline-lg">YOUR BID!</div>
                   <div className="bid-options">
-                    {Array.from({ length: 13 }, (_, i) => i + 1).map(n => (
+                    {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
                       <button
                         key={n}
                         className={`bid-btn ${selectedBid === n ? 'selected' : ''}`}
@@ -411,21 +419,21 @@ export function GameScreen({ gameState }: Props) {
 
             {gameState.phase === 'bidding' && isMyTurn && gameState.mode === 'team' && (
               <div className="bid-overlay">
-                <div className="bid-panel p-4" style={{ maxWidth: '400px' }}>
+                <div className="bid-panel p-4" style={{ minWidth: '500px' }}>
                   <div className="bid-title headline-lg text-center">TEAM BID</div>
 
                   {gameState.highestBid !== null && (
                     <div className="body-md text-center mb-4" style={{ color: 'var(--primary)' }}>
-                      Current High: <strong>{gameState.highestBid}</strong> by {gameState.players.find(p => p.id === gameState.highestBidder)?.name}
+                      Current High: <strong>{gameState.highestBid} {gameState.trumpSuit ? SUIT_SYMBOLS[gameState.trumpSuit] : ''}</strong> by {gameState.players.find(p => p.id === gameState.highestBidder)?.name}
                     </div>
                   )}
 
-                  <div className="flex gap-2 justify-center mb-6 mt-2">
+                  <div className="flex gap-2 justify-center mb-6 mt-2" style={{ marginTop: '1.5rem' }}>
                     {(['spades', 'hearts', 'diamonds', 'clubs'] as Suit[]).map(s => (
                       <button
                         key={s}
                         className={`btn ${selectedSuit === s ? 'btn-primary' : 'btn-outline'}`}
-                        style={{ flex: 1, padding: '0.5rem', fontSize: '1.5rem' }}
+                        style={{ flex: 1, padding: '0.75rem', fontSize: '1.5rem' }}
                         onClick={() => setSelectedSuit(s)}
                       >
                         <span className={selectedSuit !== s ? SUIT_COLORS[s] : ''}>{SUIT_SYMBOLS[s]}</span>
@@ -433,7 +441,7 @@ export function GameScreen({ gameState }: Props) {
                     ))}
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex justify-center" style={{ gap: '2.5rem', marginTop: '1.5rem' }}>
                     <button
                       className="btn btn-outline flex-1"
                       onClick={() => {
@@ -477,7 +485,7 @@ export function GameScreen({ gameState }: Props) {
                   <div className="bid-title headline-lg">ROUND COMPLETE</div>
                   <div style={{ marginTop: '0.75rem' }}>
                     {roundScores.map((s: any) => (
-                      <div key={s.playerId} className="score-row" style={{ padding: '0.35rem 0', borderBottom: '1px solid var(--outline)' }}>
+                      <div key={s.playerId} className="score-row" style={{ padding: '0.35rem 0' }}>
                         <span style={{ fontWeight: s.playerId === myId ? 700 : 400 }}>
                           {s.playerId === myId ? 'YOU' : s.name}
                         </span>

@@ -308,7 +308,6 @@
   flex-direction: row;
   align-items: center;
   gap: 2rem;
-  max-width: 800px;
   width: 100%;
   margin: 0 auto;
   overflow: hidden;
@@ -1229,7 +1228,8 @@
   .app {
     width: 100vw;
     height: 100dvh;
-    height: 100vh; /* fallback */
+    height: 100vh;
+    /* fallback */
     overflow: hidden;
     position: relative;
     /* Safe areas for notched devices */
@@ -1238,7 +1238,9 @@
   }
 
   @supports (height: 100dvh) {
-    .app { height: 100dvh; }
+    .app {
+      height: 100dvh;
+    }
   }
 
   /* Non-game screens: scale content to fit viewport (var set by JS) */
@@ -1249,12 +1251,13 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    padding: 0.5rem;
+    max-width: none;
   }
 
   .main-content>* {
     transform-origin: center center;
     transform: scale(var(--ui-scale, 0.55));
-    max-width: 800px;
     width: 100%;
   }
 
@@ -1293,7 +1296,7 @@
 
   .app.game-active .game-layout {
     width: 1400px;
-    height: 560px;
+    height: 400px;
     max-width: none;
     margin: 0;
     flex-shrink: 0;
@@ -1318,10 +1321,45 @@
     max-height: 100%;
   }
 
-  /* Larger playing cards on mobile */
+  .scoreboard-inner {
+    padding: 0.75rem 1rem;
+  }
+
+  .scoreboard-title {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: none;
+  }
+
+  .score-row {
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+
+  .score-value {
+    font-size: 1.3rem;
+  }
+
+  .scoreboard-subtitle {
+    display: none;
+  }
+
+  .score-totals {
+    display: none;
+  }
+
+  .round-indicator {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    padding-top: 0.4rem;
+    border-top: none;
+  }
+
+  /* Smaller playing cards on mobile landscape */
   .playing-card {
-    width: 150px;
-    height: 210px;
+    width: 86px;
+    height: 125px;
   }
 
   .my-hand>* {
@@ -1330,5 +1368,79 @@
 
   .my-hand>*:first-child {
     margin-left: 0;
+  }
+
+  /* Shrink player avatars & card backs for shorter table */
+  .player-avatar-img {
+    width: 64px;
+    height: 64px;
+    border-width: 3px;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .player-name-tag {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .player-stats {
+    display: none;
+  }
+
+  .card-back-styled {
+    width: 36px;
+    height: 50px;
+    margin-left: -16px;
+    border-width: 3px;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .card-back-styled:first-child {
+    margin-left: 0;
+  }
+
+  .card-back-row {
+    margin-top: 0.2rem;
+  }
+
+  .table-player.top {
+    top: -64px;
+  }
+
+  .table-player.bottom {
+    bottom: -40px;
+  }
+
+  .table-player.left {
+    left: -34px;
+    top: 40%;
+    transform: translateY(-50%);
+  }
+
+  .table-player.right {
+    right: -34px;
+    top: 40%;
+    transform: translateY(-50%);
+  }
+
+  /* Bigger bid panel on mobile */
+  .bid-panel {
+    padding: 2rem 3rem;
+    border-radius: var(--radius-xl);
+  }
+
+  .bid-title {
+    font-size: 2rem;
+  }
+
+  .bid-btn {
+    width: 56px;
+    height: 56px;
+    font-size: 1.3rem;
+  }
+
+  .bid-options {
+    max-width: 400px;
+    gap: 0.6rem;
   }
 }

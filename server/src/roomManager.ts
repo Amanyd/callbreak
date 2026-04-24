@@ -31,7 +31,7 @@ export function createRoom(hostId: string, hostName: string): Room {
     code,
     host: hostId,
     mode: 'solo',
-    totalRounds: 5,
+    totalRounds: 1,
     players: [host],
     state: 'waiting',
   };
@@ -129,8 +129,8 @@ export function setMode(code: string, playerId: string, mode: RoomMode): Room {
   if (room.host !== playerId) throw new Error('Only the host can change the mode');
   room.mode = mode;
   // Reset rounds when switching modes
-  if (mode === 'solo') room.totalRounds = 5;
-  if (mode === 'team') room.totalRounds = 4;
+  if (mode === 'solo') room.totalRounds = 1;
+  if (mode === 'team') room.totalRounds = 1;
   return room;
 }
 

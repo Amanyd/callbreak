@@ -25,18 +25,8 @@ export function ResultsScreen({ rankings, onPlayAgain, onBackToLobby }: Props) {
 
   // For team mode, deduplicate by teamLabel so we show 2 team rows, not 4 player rows
   const isTeam = rankings.some(r => r.teamLabel);
-  let displayRows: Ranking[];
-  if (isTeam) {
-    const seen = new Set<string>();
-    displayRows = rankings.filter(r => {
-      const key = r.teamLabel || r.playerId;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  } else {
-    displayRows = rankings;
-  }
+  // Show all players in both modes
+  const displayRows = rankings;
 
   const champion = displayRows[0];
 

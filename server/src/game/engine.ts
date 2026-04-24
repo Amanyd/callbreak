@@ -204,7 +204,7 @@ export function completeTrick(state: GameState): string {
 
 /** Check if round is over (13 tricks completed) */
 export function isRoundOver(state: GameState): boolean {
-  return state.trick > 1; // TEMP: was 13, set to 1 for testing
+  return state.trick > 13;
 }
 
 /** Score the round */
